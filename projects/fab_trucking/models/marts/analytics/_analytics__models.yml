@@ -1,0 +1,67 @@
+version: 2
+
+models:
+  - name: rpt_fab_trucking__truck_offline_gold
+    description: Main semantic view for the Fab Trucking offline management application
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier1
+    columns:
+      - name: offline_case_id
+        description: Primary key for offline case
+        data_tests:
+          - unique
+          - not_null
+      - name: vin
+        description: Vehicle Identification Number
+        data_tests:
+          - not_null
+      - name: composite_risk_score
+        description: Calculated risk score for prioritization
+
+  - name: rpt_fab_trucking__offline_backlog
+    description: Aggregated backlog dashboard by plant and overall
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier1
+    columns:
+      - name: plant_code
+        description: Plant code (or 'ALL' for overall summary)
+        data_tests:
+          - not_null
+
+  - name: rpt_fab_trucking__supplier_shortage_impact
+    description: Supplier impact analysis for material shortages
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier1
+    columns:
+      - name: supplier_id
+        description: Primary key for supplier
+        data_tests:
+          - unique
+          - not_null
+      - name: supplier_risk_score
+        description: Calculated supplier risk score
+
+  - name: rpt_fab_trucking__plant_performance
+    description: Plant-level performance metrics and KPIs
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier1
+    columns:
+      - name: plant_id
+        description: Primary key for plant
+        data_tests:
+          - unique
+          - not_null
+      - name: plant_health_score
+        description: Overall plant health score (0-100)

@@ -1,0 +1,16 @@
+list_id,list_code,list_name,region,authority,last_updated,substance_count
+LIST-01,SVHC,EU REACH SVHC Candidate List,EU,ECHA,2025-06-15,240
+LIST-02,RoHS,EU RoHS Directive 2011/65/EU,EU,European Commission,2024-12-01,10
+LIST-03,TSCA_PBT,TSCA PBT Chemicals,US,EPA,2025-03-20,5
+LIST-04,CA_PROP65,California Proposition 65,US,OEHHA,2025-09-01,980
+LIST-05,K_REACH,Korea Registration Evaluation Authorization of Chemicals,KR,Ministry of Environment,2025-01-10,510
+LIST-06,GADSL,Global Automotive Declarable Substance List,GLOBAL,GASG,2025-04-30,170
+LIST-07,CEPA,Canadian Environmental Protection Act,CA,Environment Canada,2024-11-15,150
+LIST-08,PFAS,PFAS Chemical Action Lists,US,EPA,2025-10-22,12000
+LIST-09,EU_ODS,EU Ozone Depleting Substances Regulation,EU,European Commission,2024-07-01,95
+LIST-10,IARC,IARC Carcinogen Classifications,GLOBAL,WHO,2025-02-28,320
+LIST-11,China_Toxic,Catalog of Toxic Chemicals Severely Restricted in China,CN,MEE,2025-05-18,40
+LIST-12,AD_DSL,Aerospace Defense Declarable Substance List,GLOBAL,IAEG,2025-08-01,200
+LIST-13,TSCA_12B,TSCA Section 12b Export Notification,US,EPA,2025-06-30,750
+LIST-14,China_HazChem,Catalog of Hazardous Chemicals,CN,MEM,2024-09-15,2800
+LIST-15,TW_Toxic,Taiwan Toxic and Concerned Chemical Substances,TW,MoE,2025-03-01,340

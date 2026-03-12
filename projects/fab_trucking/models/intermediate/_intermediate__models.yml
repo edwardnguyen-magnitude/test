@@ -1,0 +1,96 @@
+version: 2
+
+models:
+  - name: int_fab_trucking__offline_cases_enriched
+    description: Enriched offline cases with truck, plant, configuration, and customer details
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier2
+    columns:
+      - name: offline_case_id
+        description: Primary key for offline case
+        data_tests:
+          - unique
+          - not_null
+      - name: vin
+        description: Vehicle Identification Number
+        data_tests:
+          - not_null
+      - name: offline_age_days
+        description: Number of days the truck has been offline
+      - name: total_truck_value
+        description: Total value of the truck including configuration adjustments
+
+  - name: int_fab_trucking__shortage_impact
+    description: Material shortages with impact analysis and related offline cases
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier2
+    columns:
+      - name: shortage_id
+        description: Primary key for shortage
+        data_tests:
+          - unique
+          - not_null
+      - name: shortage_age_days
+        description: Number of days since shortage was detected
+      - name: is_open_shortage
+        description: Whether the shortage is still open
+      - name: severity_score
+        description: Numeric severity score (1-4)
+
+  - name: int_fab_trucking__approval_timeline
+    description: Approval events with wait time calculations and status
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier2
+    columns:
+      - name: approval_event_id
+        description: Primary key for approval event
+        data_tests:
+          - unique
+          - not_null
+      - name: wait_hours
+        description: Hours waited for approval decision
+      - name: wait_band
+        description: Wait time classification (GREEN/YELLOW/RED)
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['GREEN', 'YELLOW', 'RED']
+      - name: is_pending
+        description: Whether approval is still pending
+
+  - name: int_fab_trucking__quality_status
+    description: Aggregated quality status per VIN including inspections, tests, and defects
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier2
+    columns:
+      - name: vin
+        description: Vehicle Identification Number
+        data_tests:
+          - unique
+          - not_null
+      - name: qa_status
+        description: Overall QA status classification
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['CRITICAL_ISSUES', 'MAJOR_ISSUES', 'NEEDS_REWORK', 'IN_PROGRESS', 'PENDING', 'COMPLETE']
+      - name: test_status
+        description: Overall test status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['FAIL', 'PENDING', 'NOT_REQUIRED', 'PASS']
+      - name: critical_open_defects
+        description: Count of critical severity open defects

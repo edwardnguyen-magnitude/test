@@ -1,0 +1,23 @@
+default:
+  target: postgres
+  outputs:
+    postgres:
+      type: postgres
+      host: "{{ env_var('DBT_HOST', 'localhost') }}"
+      port: "{{ env_var('DBT_PORT', '5432') | int }}"
+      user: "{{ env_var('DBT_USER', 'postgres') }}"
+      pass: "{{ env_var('DBT_PASSWORD', 'postgres') }}"
+      dbname: "{{ env_var('DBT_DATABASE') }}"
+      schema: raw
+      threads: 4
+      sslmode: "{{ env_var('DBT_SSLMODE', 'prefer') }}"
+    source:
+      type: postgres
+      host: "{{ env_var('DBT_HOST', 'localhost') }}"
+      port: "{{ env_var('DBT_PORT', '5432') | int }}"
+      user: "{{ env_var('DBT_USER', 'postgres') }}"
+      pass: "{{ env_var('DBT_PASSWORD', 'postgres') }}"
+      dbname: "{{ env_var('DBT_SOURCE_DATABASE', 'source') }}"
+      schema: public
+      threads: 4
+      sslmode: "{{ env_var('DBT_SSLMODE', 'prefer') }}"

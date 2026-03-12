@@ -1,0 +1,332 @@
+version: 2
+
+models:
+  - name: mart_product_compliance_status
+    description: >
+      Executive-level product compliance summary. One row per product showing
+      its overall compliance posture across all regulatory lists screened.
+      Used by the compliance dashboard to identify products requiring attention.
+    config:
+      tags: ["Gold", "substance-screening", "executive-dashboard"]
+    meta:
+      domain: "Regulatory Compliance"
+      data_owner: "ESI Regulatory Affairs"
+      contains_pii: false
+      grain: "One row per product"
+      business_purpose: "Identify non-compliant and critical products across ESI portfolio"
+    columns:
+      - name: product_id
+        description: Unique product identifier (PRD-NNN format)
+        tags: ["identifier"]
+        tests: [unique, not_null]
+      - name: product_description
+        description: Human-readable product name
+      - name: business_unit
+        description: ESI business unit that manufactures this product
+      - name: product_category
+        description: Product classification category (Soldering Materials, Surface Finishing, etc.)
+      - name: lists_screened
+        description: Number of distinct regulatory lists this product has been checked against
+        tags: ["metric"]
+        meta:
+          cube_measure: avg
+      - name: substances_checked
+        description: Total number of substance-list combinations evaluated for this product
+        tags: ["metric"]
+      - name: violations_found
+        description: Total number of substance-list threshold violations detected
+        tags: ["metric"]
+        meta:
+          cube_measure: sum
+      - name: lists_with_violations
+        description: Number of distinct regulatory lists where at least one violation was found
+        tags: ["metric"]
+      - name: oldest_verification
+        description: Earliest verification date across all substance checks for this product
+      - name: latest_verification
+        description: Most recent verification date across all substance checks for this product
+      - name: overall_compliance_status
+        description: >
+          Rollup compliance status: CRITICAL (any banned substance violation),
+          NON_COMPLIANT (restricted/declarable/candidate violations but no banned),
+          COMPLIANT (no violations), UNKNOWN (no screening data)
+        meta:
+          cube_segments:
+            - name: compliant
+              value: COMPLIANT
+            - name: non_compliant
+              value: NON_COMPLIANT
+            - name: critical
+              value: CRITICAL
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['COMPLIANT', 'NON_COMPLIANT', 'CRITICAL', 'UNKNOWN']
+      - name: violation_list_codes
+        description: Comma-separated list of regulatory list codes where violations were found (null if compliant)
+
+  - name: mart_substance_risk_assessment
+    description: >
+      Risk assessment matrix for restricted substances across the ESI product portfolio.
+      Categorizes each substance-regulation combination by risk level based on
+      restriction type, hazard class, and portfolio exposure.
+    config:
+      tags: ["Gold", "substance-screening", "risk-management"]
+    meta:
+      domain: "Regulatory Compliance"
+      data_owner: "ESI Regulatory Affairs"
+      contains_pii: false
+      grain: "One row per substance-regulatory list combination"
+      business_purpose: "Prioritize substance risk mitigation across the product portfolio"
+    columns:
+      - name: substance_id
+        description: Unique restricted substance identifier
+        tags: ["identifier"]
+      - name: substance_name
+        description: Common chemical name of the restricted substance
+        tags: ["chemical-data"]
+      - name: cas_number
+        description: Chemical Abstracts Service registry number
+        tags: ["chemical-data"]
+      - name: hazard_class
+        description: Hazard classification (CMR, PBT, vPvB, ED, Toxic, Sensitizer, etc.)
+      - name: restriction_type
+        description: Type of regulatory restriction (banned, restricted, declarable, candidate)
+      - name: list_code
+        description: Short code for the regulatory list (SVHC, RoHS, TSCA_PBT, etc.)
+      - name: list_name
+        description: Full official name of the regulatory list
+      - name: regulation_region
+        description: Geographic jurisdiction of the regulation
+      - name: products_containing
+        description: Number of ESI products that contain this substance
+        tags: ["metric"]
+        meta:
+          cube_measure: sum
+      - name: products_exceeding_threshold
+        description: Number of products where this substance exceeds the regulatory threshold
+        tags: ["metric"]
+        meta:
+          cube_measure: sum
+      - name: max_concentration_ppm
+        description: Highest measured concentration of this substance across all products (parts per million)
+        tags: ["chemical-data", "metric"]
+        meta:
+          cube_measure: avg
+      - name: avg_concentration_ppm
+        description: Average measured concentration of this substance across all products (parts per million)
+        tags: ["chemical-data", "metric"]
+      - name: risk_level
+        description: >
+          Calculated risk level: CRITICAL (banned substance exceeding threshold),
+          HIGH (restricted substance exceeding threshold or banned with high exposure),
+          MEDIUM (declarable/candidate or moderate exposure),
+          LOW (within threshold with limited exposure)
+        meta:
+          cube_segments:
+            - name: critical_risk
+              value: CRITICAL
+            - name: high_risk
+              value: HIGH
+            - name: medium_risk
+              value: MEDIUM
+            - name: low_risk
+              value: LOW
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']
+
+  - name: mart_regional_survey_summary
+    description: >
+      Regional performance summary for regulatory survey fulfillment.
+      Tracks turnaround times, on-time delivery rates, and compliance rates
+      by region, business unit, and complexity level.
+    config:
+      tags: ["Gold", "survey-management", "executive-dashboard"]
+    meta:
+      domain: "Regulatory Compliance"
+      data_owner: "ESI Survey Operations"
+      contains_pii: false
+      grain: "One row per region-business_unit-complexity combination"
+      business_purpose: "Monitor regional survey fulfillment performance and SLA compliance"
+    columns:
+      - name: region
+        description: Geographic region (EMEA, AMERICAS, ASIA)
+      - name: business_unit
+        description: ESI business unit handling surveys
+      - name: complexity
+        description: Survey complexity level (easy, mid-complex, complex)
+      - name: total_surveys
+        description: Total number of surveys for this region-BU-complexity combination
+        tags: ["metric"]
+        meta:
+          cube_measure: sum
+      - name: total_products_assessed
+        description: Sum of all product counts across surveys in this grouping
+        tags: ["metric"]
+        meta:
+          cube_measure: sum
+      - name: completed
+        description: Number of completed surveys
+        tags: ["metric"]
+        meta:
+          cube_measure: sum
+      - name: in_progress
+        description: Number of surveys currently in progress
+        tags: ["metric"]
+      - name: on_time
+        description: Number of surveys completed on or before the due date
+        tags: ["metric"]
+        meta:
+          cube_measure: sum
+      - name: late
+        description: Number of surveys completed after the due date
+        tags: ["metric"]
+        meta:
+          cube_measure: sum
+      - name: overdue
+        description: Number of surveys not yet completed and past their due date
+        tags: ["metric"]
+      - name: avg_turnaround_days
+        description: Average number of calendar days from request to completion for completed surveys
+        tags: ["metric"]
+        meta:
+          cube_measure: avg
+      - name: on_time_rate_pct
+        description: >
+          Percentage of completed surveys delivered on or before the due date.
+          Calculated as on_time / completed * 100. Null if no surveys completed.
+        tags: ["metric"]
+        meta:
+          cube_measure: avg
+      - name: total_compliant_responses
+        description: Total number of individual product-substance responses marked as compliant
+        tags: ["metric"]
+      - name: total_non_compliant_responses
+        description: Total number of individual product-substance responses marked as non-compliant
+        tags: ["metric"]
+      - name: compliance_rate_pct
+        description: >
+          Percentage of all survey responses that are compliant.
+          Calculated as compliant / (compliant + non_compliant) * 100.
+        tags: ["metric"]
+        meta:
+          cube_measure: avg
+
+  - name: mart_customer_compliance_dashboard
+    description: >
+      Customer-level compliance metrics for account management.
+      Aggregates inquiry history, response times, and compliance findings
+      per customer for relationship management and service quality tracking.
+    config:
+      tags: ["Gold", "customer-data", "executive-dashboard"]
+    meta:
+      domain: "Regulatory Compliance"
+      data_owner: "ESI Regulatory Affairs"
+      contains_pii: false
+      grain: "One row per customer"
+      business_purpose: "Provide account-level compliance overview for customer relationship management"
+    columns:
+      - name: customer_id
+        description: Unique customer identifier (CUST-NNN format)
+        tags: ["identifier"]
+        tests: [unique, not_null]
+      - name: customer_name
+        description: Legal or trading name of the customer organization
+      - name: customer_region
+        description: Geographic region of the customer
+      - name: industry
+        description: Primary industry classification of the customer
+      - name: total_inquiries
+        description: Total number of survey requests submitted by this customer
+        tags: ["metric"]
+        meta:
+          cube_measure: sum
+      - name: inquiry_types_used
+        description: Number of distinct regulatory frameworks the customer has requested surveys for
+        tags: ["metric"]
+      - name: total_products_assessed
+        description: Total number of products assessed across all surveys for this customer
+        tags: ["metric"]
+        meta:
+          cube_measure: sum
+      - name: completed_inquiries
+        description: Number of surveys that have been completed
+        tags: ["metric"]
+      - name: on_time_deliveries
+        description: Number of surveys delivered on or before the due date
+        tags: ["metric"]
+      - name: avg_response_days
+        description: Average turnaround time in calendar days for completed surveys
+        tags: ["metric"]
+        meta:
+          cube_measure: avg
+      - name: total_substances_flagged
+        description: Total number of survey responses marked as flagged or under_review
+        tags: ["metric"]
+        meta:
+          cube_measure: sum
+      - name: total_non_compliant_findings
+        description: Total number of survey responses marked as non_compliant
+        tags: ["metric"]
+        meta:
+          cube_measure: sum
+      - name: first_inquiry_date
+        description: Date of the customer's first survey request
+      - name: latest_inquiry_date
+        description: Date of the customer's most recent survey request
+      - name: last_completed_date
+        description: Date of the most recently completed survey for this customer
+
+  - name: mart_regulatory_list_coverage
+    description: >
+      Coverage analysis showing how well each regulatory list is represented
+      in the ESI product screening program. Identifies gaps in substance screening
+      coverage and links to available data sources.
+    config:
+      tags: ["Gold", "regulatory-data", "substance-screening"]
+    meta:
+      domain: "Regulatory Compliance"
+      data_owner: "ESI Regulatory Intelligence"
+      contains_pii: false
+      grain: "One row per regulatory list"
+      business_purpose: "Identify regulatory screening gaps and data source coverage across ESI portfolio"
+    columns:
+      - name: list_id
+        description: Unique regulatory list identifier (LIST-NNN format)
+        tags: ["identifier"]
+        tests: [unique, not_null]
+      - name: list_code
+        description: Short code for the regulatory list (SVHC, RoHS, TSCA_PBT, etc.)
+      - name: list_name
+        description: Full official name of the regulatory list
+      - name: regulation_region
+        description: Geographic jurisdiction of the regulation
+      - name: products_screened
+        description: Number of products that have been screened against this regulatory list
+        tags: ["metric"]
+        meta:
+          cube_measure: sum
+      - name: avg_screening_coverage_pct
+        description: >
+          Average percentage of this list's substances that have been screened
+          across all products. Higher values indicate better screening coverage.
+        tags: ["metric"]
+        meta:
+          cube_measure: avg
+      - name: total_substance_screenings
+        description: Total number of individual substance screenings performed against this list
+        tags: ["metric"]
+        meta:
+          cube_measure: sum
+      - name: products_with_any_coverage
+        description: Number of products with at least one substance screened against this list
+        tags: ["metric"]
+      - name: products_with_good_coverage
+        description: Number of products with screening coverage above 50% for this list
+        tags: ["metric"]
+      - name: available_data_sources
+        description: >
+          Comma-separated list of regulatory data sources that cover this list's region.
+          Useful for identifying which data feeds support screening for this regulation.

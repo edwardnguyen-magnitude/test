@@ -1,0 +1,146 @@
+version: 2
+
+models:
+  - name: dim_fab_trucking__plants
+    description: Plant dimension table for Fab Trucking facilities
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier1
+    columns:
+      - name: plant_key
+        description: Surrogate key for plant
+        data_tests:
+          - unique
+          - not_null
+      - name: plant_id
+        description: Natural key for plant
+        data_tests:
+          - unique
+          - not_null
+      - name: plant_code
+        description: Short code for plant
+        data_tests:
+          - unique
+          - not_null
+      - name: is_active
+        description: Whether plant is currently active
+
+  - name: dim_fab_trucking__truck_models
+    description: Truck model dimension table
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier1
+    columns:
+      - name: truck_model_key
+        description: Surrogate key for truck model
+        data_tests:
+          - unique
+          - not_null
+      - name: truck_model_id
+        description: Natural key for truck model
+        data_tests:
+          - unique
+          - not_null
+      - name: model_code
+        description: Model code
+        data_tests:
+          - unique
+          - not_null
+
+  - name: dim_fab_trucking__configurations
+    description: Truck configuration dimension table
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier1
+    columns:
+      - name: configuration_key
+        description: Surrogate key for configuration
+        data_tests:
+          - unique
+          - not_null
+      - name: configuration_id
+        description: Natural key for configuration
+        data_tests:
+          - unique
+          - not_null
+      - name: total_configuration_price
+        description: Total price including base MSRP and configuration adjustments
+
+  - name: dim_fab_trucking__customers
+    description: Customer dimension table
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier1
+    columns:
+      - name: customer_key
+        description: Surrogate key for customer
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: Natural key for customer
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_code
+        description: Customer code
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_name
+        description: Customer company name
+        meta:
+          openmetadata:
+            tags: [PII.Sensitive]
+      - name: credit_limit
+        description: Customer credit limit
+        meta:
+          openmetadata:
+            tags: [PII.Financial]
+
+  - name: dim_fab_trucking__workcenters
+    description: Workcenter dimension table for plant work areas (Assembly, Paint, QA, Dyno, Shipping)
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier1
+    columns:
+      - name: workcenter_key
+        description: Surrogate key for workcenter
+        data_tests:
+          - unique
+          - not_null
+      - name: workcenter_id
+        description: Natural key for workcenter
+        data_tests:
+          - unique
+          - not_null
+      - name: plant_id
+        description: Foreign key to plant
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_fab_trucking__plants')
+                field: plant_id
+      - name: workcenter_code
+        description: Short code for workcenter
+        data_tests:
+          - not_null
+      - name: area
+        description: Workcenter area type (ASSEMBLY, PAINT, QA, DYNO, SHIPPING)
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['ASSEMBLY', 'PAINT', 'QA', 'DYNO', 'SHIPPING']
+      - name: is_active
+        description: Whether workcenter is currently active

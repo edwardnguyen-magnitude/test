@@ -1,0 +1,182 @@
+substance_id,substance_name,cas_number,list_id,threshold_ppm,restriction_type,hazard_class
+SUB-0001,Lead,7439-92-1,LIST-01,1000,candidate,CMR
+SUB-0002,Lead,7439-92-1,LIST-02,1000,restricted,CMR
+SUB-0003,Lead,7439-92-1,LIST-04,0,declarable,CMR
+SUB-0004,Lead,7439-92-1,LIST-06,1000,declarable,CMR
+SUB-0005,Lead,7439-92-1,LIST-10,0,declarable,Carcinogen
+SUB-0006,Lead,7439-92-1,LIST-12,1000,restricted,CMR
+SUB-0007,Lead,7439-92-1,LIST-14,100,restricted,Toxic
+SUB-0008,Cadmium,7440-43-9,LIST-01,100,candidate,CMR
+SUB-0009,Cadmium,7440-43-9,LIST-02,100,restricted,CMR
+SUB-0010,Cadmium,7440-43-9,LIST-04,0,declarable,Carcinogen
+SUB-0011,Cadmium,7440-43-9,LIST-06,100,declarable,CMR
+SUB-0012,Cadmium,7440-43-9,LIST-10,0,declarable,Carcinogen
+SUB-0013,Cadmium,7440-43-9,LIST-12,100,restricted,CMR
+SUB-0014,Mercury,7439-97-6,LIST-01,1000,banned,CMR
+SUB-0015,Mercury,7439-97-6,LIST-02,1000,restricted,Toxic
+SUB-0016,Mercury,7439-97-6,LIST-04,0,declarable,CMR
+SUB-0017,Mercury,7439-97-6,LIST-07,10,restricted,Toxic
+SUB-0018,Mercury,7439-97-6,LIST-11,10,banned,Toxic
+SUB-0019,Hexavalent Chromium,18540-29-9,LIST-01,1000,candidate,CMR
+SUB-0020,Hexavalent Chromium,18540-29-9,LIST-02,1000,restricted,CMR
+SUB-0021,Hexavalent Chromium,18540-29-9,LIST-04,0,declarable,Carcinogen
+SUB-0022,Hexavalent Chromium,18540-29-9,LIST-06,1000,restricted,CMR
+SUB-0023,Hexavalent Chromium,18540-29-9,LIST-10,0,declarable,Carcinogen
+SUB-0024,Polybrominated Biphenyls (PBBs),59536-65-1,LIST-02,1000,restricted,PBT
+SUB-0025,Polybrominated Biphenyls (PBBs),59536-65-1,LIST-06,1000,restricted,PBT
+SUB-0026,Polybrominated Diphenyl Ethers (PBDEs),32534-81-9,LIST-02,1000,restricted,PBT
+SUB-0027,Polybrominated Diphenyl Ethers (PBDEs),32534-81-9,LIST-06,1000,restricted,PBT
+SUB-0028,Polybrominated Diphenyl Ethers (PBDEs),32534-81-9,LIST-03,500,restricted,PBT
+SUB-0029,PFOA,335-67-1,LIST-01,25,banned,vPvB
+SUB-0030,PFOA,335-67-1,LIST-08,25,restricted,PBT
+SUB-0031,PFOA,335-67-1,LIST-04,0,declarable,Carcinogen
+SUB-0032,PFOA,335-67-1,LIST-07,25,restricted,PBT
+SUB-0033,PFOS,1763-23-1,LIST-01,10,banned,vPvB
+SUB-0034,PFOS,1763-23-1,LIST-08,10,restricted,PBT
+SUB-0035,PFOS,1763-23-1,LIST-11,10,banned,PBT
+SUB-0036,Bisphenol A,80-05-7,LIST-01,0,candidate,EDC
+SUB-0037,Bisphenol A,80-05-7,LIST-04,0,declarable,EDC
+SUB-0038,Bisphenol A,80-05-7,LIST-05,100,restricted,EDC
+SUB-0039,DEHP (Di-2-ethylhexyl phthalate),117-81-7,LIST-01,1000,candidate,CMR
+SUB-0040,DEHP (Di-2-ethylhexyl phthalate),117-81-7,LIST-02,1000,restricted,CMR
+SUB-0041,DEHP (Di-2-ethylhexyl phthalate),117-81-7,LIST-04,0,declarable,CMR
+SUB-0042,DEHP (Di-2-ethylhexyl phthalate),117-81-7,LIST-06,1000,restricted,CMR
+SUB-0043,DBP (Dibutyl phthalate),84-74-2,LIST-01,1000,candidate,CMR
+SUB-0044,DBP (Dibutyl phthalate),84-74-2,LIST-02,1000,restricted,CMR
+SUB-0045,DBP (Dibutyl phthalate),84-74-2,LIST-04,0,declarable,CMR
+SUB-0046,BBP (Benzyl butyl phthalate),85-68-7,LIST-01,1000,candidate,CMR
+SUB-0047,BBP (Benzyl butyl phthalate),85-68-7,LIST-02,1000,restricted,CMR
+SUB-0048,BBP (Benzyl butyl phthalate),85-68-7,LIST-04,0,declarable,CMR
+SUB-0049,DIBP (Diisobutyl phthalate),84-69-5,LIST-01,1000,candidate,CMR
+SUB-0050,DIBP (Diisobutyl phthalate),84-69-5,LIST-02,1000,restricted,CMR
+SUB-0051,Toluene,108-88-3,LIST-04,0,declarable,CMR
+SUB-0052,Toluene,108-88-3,LIST-13,5000,declarable,Toxic
+SUB-0053,Toluene,108-88-3,LIST-14,1000,restricted,Toxic
+SUB-0054,Benzene,71-43-2,LIST-01,5,candidate,Carcinogen
+SUB-0055,Benzene,71-43-2,LIST-04,0,declarable,Carcinogen
+SUB-0056,Benzene,71-43-2,LIST-10,0,declarable,Carcinogen
+SUB-0057,Benzene,71-43-2,LIST-14,10,restricted,Carcinogen
+SUB-0058,Formaldehyde,50-00-0,LIST-01,0,candidate,CMR
+SUB-0059,Formaldehyde,50-00-0,LIST-04,0,declarable,Carcinogen
+SUB-0060,Formaldehyde,50-00-0,LIST-10,0,declarable,Carcinogen
+SUB-0061,Formaldehyde,50-00-0,LIST-05,100,restricted,CMR
+SUB-0062,Asbestos (Chrysotile),12001-29-5,LIST-01,0,banned,Carcinogen
+SUB-0063,Asbestos (Chrysotile),12001-29-5,LIST-04,0,declarable,Carcinogen
+SUB-0064,Asbestos (Chrysotile),12001-29-5,LIST-10,0,declarable,Carcinogen
+SUB-0065,Asbestos (Chrysotile),12001-29-5,LIST-11,0,banned,Carcinogen
+SUB-0066,DecaBDE,1163-19-5,LIST-01,500,restricted,PBT
+SUB-0067,DecaBDE,1163-19-5,LIST-03,500,restricted,PBT
+SUB-0068,DecaBDE,1163-19-5,LIST-06,500,restricted,PBT
+SUB-0069,PIP (3:1),13674-84-5,LIST-03,1000,restricted,PBT
+SUB-0070,PIP (3:1),13674-84-5,LIST-13,1000,declarable,PBT
+SUB-0071,"2,4,6-Tri-tert-butylphenol (2,4,6-TTBP)",732-26-3,LIST-03,300,restricted,PBT
+SUB-0072,"2,4,6-Tri-tert-butylphenol (2,4,6-TTBP)",732-26-3,LIST-01,300,candidate,vPvB
+SUB-0073,Hexachlorobutadiene (HCBD),87-68-3,LIST-01,0,banned,PBT
+SUB-0074,Hexachlorobutadiene (HCBD),87-68-3,LIST-03,100,restricted,PBT
+SUB-0075,Hexachlorobutadiene (HCBD),87-68-3,LIST-11,50,banned,PBT
+SUB-0076,Pentachlorophenol,87-86-5,LIST-01,5,banned,PBT
+SUB-0077,Pentachlorophenol,87-86-5,LIST-03,5,restricted,PBT
+SUB-0078,Pentachlorophenol,87-86-5,LIST-04,0,declarable,Carcinogen
+SUB-0079,Diisocyanates (MDI),101-68-8,LIST-01,0,candidate,Sensitizer
+SUB-0080,Diisocyanates (MDI),101-68-8,LIST-04,0,declarable,Sensitizer
+SUB-0081,Diisocyanates (MDI),101-68-8,LIST-06,1000,declarable,Sensitizer
+SUB-0082,Nickel,7440-02-0,LIST-01,0,candidate,CMR
+SUB-0083,Nickel,7440-02-0,LIST-04,0,declarable,Carcinogen
+SUB-0084,Nickel,7440-02-0,LIST-10,0,declarable,Carcinogen
+SUB-0085,Nickel,7440-02-0,LIST-05,500,restricted,CMR
+SUB-0086,Cobalt dichloride,7646-79-9,LIST-01,0,candidate,CMR
+SUB-0087,Cobalt dichloride,7646-79-9,LIST-04,0,declarable,Carcinogen
+SUB-0088,Arsenic,7440-38-2,LIST-01,0,candidate,CMR
+SUB-0089,Arsenic,7440-38-2,LIST-04,0,declarable,Carcinogen
+SUB-0090,Arsenic,7440-38-2,LIST-10,0,declarable,Carcinogen
+SUB-0091,Arsenic,7440-38-2,LIST-14,100,restricted,Toxic
+SUB-0092,Antimony trioxide,1309-64-4,LIST-01,0,candidate,CMR
+SUB-0093,Antimony trioxide,1309-64-4,LIST-04,0,declarable,Carcinogen
+SUB-0094,Antimony trioxide,1309-64-4,LIST-10,0,declarable,Carcinogen
+SUB-0095,Tributyltin compounds (TBT),688-73-3,LIST-01,0,banned,PBT
+SUB-0096,Tributyltin compounds (TBT),688-73-3,LIST-11,10,banned,Toxic
+SUB-0097,Tributyltin compounds (TBT),688-73-3,LIST-15,50,restricted,PBT
+SUB-0098,Nonylphenol,25154-52-3,LIST-01,0,candidate,EDC
+SUB-0099,Nonylphenol,25154-52-3,LIST-05,100,restricted,EDC
+SUB-0100,Nonylphenol,25154-52-3,LIST-07,100,restricted,EDC
+SUB-0101,Octylphenol,27193-28-8,LIST-01,0,candidate,EDC
+SUB-0102,Octylphenol,27193-28-8,LIST-05,100,restricted,EDC
+SUB-0103,Diarsenic trioxide,1327-53-3,LIST-01,0,candidate,CMR
+SUB-0104,Diarsenic trioxide,1327-53-3,LIST-04,0,declarable,Carcinogen
+SUB-0105,Trichloroethylene,79-01-6,LIST-01,0,candidate,CMR
+SUB-0106,Trichloroethylene,79-01-6,LIST-04,0,declarable,Carcinogen
+SUB-0107,Trichloroethylene,79-01-6,LIST-10,0,declarable,Carcinogen
+SUB-0108,Methylene chloride (DCM),75-09-2,LIST-04,0,declarable,Carcinogen
+SUB-0109,Methylene chloride (DCM),75-09-2,LIST-10,0,declarable,Carcinogen
+SUB-0110,Methylene chloride (DCM),75-09-2,LIST-14,500,restricted,Toxic
+SUB-0111,Carbon tetrachloride,56-23-5,LIST-09,0,banned,Toxic
+SUB-0112,Carbon tetrachloride,56-23-5,LIST-04,0,declarable,Carcinogen
+SUB-0113,Carbon tetrachloride,56-23-5,LIST-14,10,banned,Toxic
+SUB-0114,"1,1,1-Trichloroethane",71-55-6,LIST-09,0,banned,Toxic
+SUB-0115,"1,1,1-Trichloroethane",71-55-6,LIST-07,0,banned,Toxic
+SUB-0116,HCFC-141b,1717-00-6,LIST-09,0,restricted,Toxic
+SUB-0117,HCFC-141b,1717-00-6,LIST-07,0,restricted,Toxic
+SUB-0118,N-Methyl-2-pyrrolidone (NMP),872-50-4,LIST-01,0,candidate,CMR
+SUB-0119,N-Methyl-2-pyrrolidone (NMP),872-50-4,LIST-06,3000,declarable,CMR
+SUB-0120,Dimethylformamide (DMF),68-12-2,LIST-01,0,candidate,CMR
+SUB-0121,Dimethylformamide (DMF),68-12-2,LIST-04,0,declarable,CMR
+SUB-0122,Dimethylformamide (DMF),68-12-2,LIST-14,500,restricted,Toxic
+SUB-0123,Perfluorohexanoic acid (PFHxA),307-24-4,LIST-08,25,restricted,PBT
+SUB-0124,Perfluorohexanoic acid (PFHxA),307-24-4,LIST-01,25,candidate,vPvB
+SUB-0125,GenX (HFPO-DA),13252-13-6,LIST-08,10,restricted,PBT
+SUB-0126,GenX (HFPO-DA),13252-13-6,LIST-04,0,declarable,Toxic
+SUB-0127,Strontium chromate,7789-06-2,LIST-01,0,candidate,CMR
+SUB-0128,Strontium chromate,7789-06-2,LIST-12,100,restricted,CMR
+SUB-0129,Chromium trioxide,1333-82-0,LIST-01,0,candidate,CMR
+SUB-0130,Chromium trioxide,1333-82-0,LIST-12,100,restricted,CMR
+SUB-0131,Chromium trioxide,1333-82-0,LIST-10,0,declarable,Carcinogen
+SUB-0132,Boric acid,10043-35-3,LIST-01,0,candidate,CMR
+SUB-0133,Boric acid,10043-35-3,LIST-04,0,declarable,CMR
+SUB-0134,Boric acid,10043-35-3,LIST-05,500,restricted,CMR
+SUB-0135,Sodium dichromate,10588-01-9,LIST-01,0,candidate,CMR
+SUB-0136,Sodium dichromate,10588-01-9,LIST-04,0,declarable,Carcinogen
+SUB-0137,Diboron trioxide,1303-86-2,LIST-01,0,candidate,CMR
+SUB-0138,Triethyl phosphate,78-40-0,LIST-13,5000,declarable,Toxic
+SUB-0139,Triethyl phosphate,78-40-0,LIST-14,1000,restricted,Toxic
+SUB-0140,Short-chain chlorinated paraffins (SCCPs),85535-84-8,LIST-01,0,banned,PBT
+SUB-0141,Short-chain chlorinated paraffins (SCCPs),85535-84-8,LIST-06,1500,restricted,PBT
+SUB-0142,Short-chain chlorinated paraffins (SCCPs),85535-84-8,LIST-11,50,banned,PBT
+SUB-0143,Medium-chain chlorinated paraffins (MCCPs),85681-73-8,LIST-01,0,candidate,vPvB
+SUB-0144,Medium-chain chlorinated paraffins (MCCPs),85681-73-8,LIST-06,1500,declarable,PBT
+SUB-0145,"4,4'-Diaminodiphenylmethane (MDA)",101-77-9,LIST-01,0,candidate,CMR
+SUB-0146,"4,4'-Diaminodiphenylmethane (MDA)",101-77-9,LIST-04,0,declarable,Carcinogen
+SUB-0147,Diethylhexyl phthalate (DEHA),103-23-1,LIST-01,0,candidate,EDC
+SUB-0148,Cyclohexane,110-82-7,LIST-14,2000,restricted,Toxic
+SUB-0149,Ethylene glycol monoethyl ether,110-80-5,LIST-01,0,candidate,CMR
+SUB-0150,Ethylene glycol monoethyl ether,110-80-5,LIST-04,0,declarable,CMR
+SUB-0151,Acrylamide,79-06-1,LIST-01,0,candidate,CMR
+SUB-0152,Acrylamide,79-06-1,LIST-04,0,declarable,Carcinogen
+SUB-0153,Acrylamide,79-06-1,LIST-10,0,declarable,Carcinogen
+SUB-0154,Beryllium,7440-41-7,LIST-01,0,candidate,CMR
+SUB-0155,Beryllium,7440-41-7,LIST-04,0,declarable,Carcinogen
+SUB-0156,Beryllium,7440-41-7,LIST-12,1000,restricted,CMR
+SUB-0157,Selenium,7782-49-2,LIST-04,0,declarable,Toxic
+SUB-0158,Selenium,7782-49-2,LIST-14,500,restricted,Toxic
+SUB-0159,Thallium,7440-28-0,LIST-04,0,declarable,Toxic
+SUB-0160,Thallium,7440-28-0,LIST-14,100,restricted,Toxic
+SUB-0161,Bis(2-methoxyethyl) ether (Diglyme),111-96-6,LIST-01,0,candidate,CMR
+SUB-0162,"1,2-Dichloroethane",107-06-2,LIST-01,0,candidate,CMR
+SUB-0163,"1,2-Dichloroethane",107-06-2,LIST-04,0,declarable,Carcinogen
+SUB-0164,"1,2-Dichloroethane",107-06-2,LIST-10,0,declarable,Carcinogen
+SUB-0165,Vinyl chloride,75-01-4,LIST-04,0,declarable,Carcinogen
+SUB-0166,Vinyl chloride,75-01-4,LIST-10,0,declarable,Carcinogen
+SUB-0167,Vinyl chloride,75-01-4,LIST-14,10,banned,Carcinogen
+SUB-0168,Hydrazine,302-01-2,LIST-01,0,candidate,CMR
+SUB-0169,Hydrazine,302-01-2,LIST-04,0,declarable,Carcinogen
+SUB-0170,PFBS,375-73-5,LIST-01,0,candidate,vPvB
+SUB-0171,PFBS,375-73-5,LIST-08,50,restricted,PBT
+SUB-0172,6:2 Fluorotelomer alcohol (6:2 FTOH),647-42-7,LIST-08,100,restricted,PBT
+SUB-0173,Dimethyl sulfoxide (DMSO),67-68-5,LIST-14,5000,declarable,Toxic
+SUB-0174,Isopropanol,67-63-0,LIST-04,0,declarable,Toxic
+SUB-0175,Rosin (Colophony),8050-09-7,LIST-06,5000,declarable,Sensitizer
+SUB-0176,Adipic acid,124-04-9,LIST-13,10000,declarable,Toxic
+SUB-0177,Tin,7440-31-5,LIST-14,5000,declarable,Toxic
+SUB-0178,Tin,7440-31-5,LIST-15,2000,restricted,Toxic
+SUB-0179,Copper,7440-50-8,LIST-14,5000,declarable,Toxic
+SUB-0180,Zinc,7440-66-6,LIST-14,5000,declarable,Toxic
+SUB-0181,Silver,7440-22-4,LIST-14,5000,declarable,Toxic

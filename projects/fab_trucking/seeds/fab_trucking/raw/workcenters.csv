@@ -1,0 +1,19 @@
+workcenter_id,tenant_id,plant_id,code,name,area,capacity_units_per_shift,shift_pattern,status,created_at
+WC001,fab_trucking,PLT001,ASSY_LINE_1,Assembly Line 1,ASSEMBLY,15,{"shifts": 3},ACTIVE,2020-01-15
+WC002,fab_trucking,PLT001,ASSY_LINE_2,Assembly Line 2,ASSEMBLY,15,{"shifts": 3},ACTIVE,2020-01-15
+WC003,fab_trucking,PLT001,ASSY_LINE_3,Assembly Line 3,ASSEMBLY,15,{"shifts": 2},ACTIVE,2021-03-01
+WC004,fab_trucking,PLT001,QA_STATION_1,QA Inspection Station 1,QA,20,{"shifts": 3},ACTIVE,2020-01-15
+WC005,fab_trucking,PLT001,QA_STATION_2,QA Inspection Station 2,QA,20,{"shifts": 2},ACTIVE,2020-01-15
+WC006,fab_trucking,PLT002,PAINT_LINE_1,Paint Line 1,PAINT,18,{"shifts": 3},ACTIVE,2020-01-15
+WC007,fab_trucking,PLT002,PAINT_LINE_2,Paint Line 2,PAINT,18,{"shifts": 3},ACTIVE,2020-01-15
+WC008,fab_trucking,PLT002,PAINT_BOOTH_CUST,Custom Paint Booth,PAINT,6,{"shifts": 2},ACTIVE,2021-06-01
+WC009,fab_trucking,PLT003,DYNO_1,Dynamometer Test Bay 1,DYNO,8,{"shifts": 2},ACTIVE,2021-03-20
+WC010,fab_trucking,PLT003,DYNO_2,Dynamometer Test Bay 2,DYNO,8,{"shifts": 2},ACTIVE,2021-03-20
+WC011,fab_trucking,PLT003,ROAD_TEST,Road Test Track,DYNO,12,{"shifts": 2},ACTIVE,2021-03-20
+WC012,fab_trucking,PLT004,ASSY_LINE_1,Assembly Line 1,ASSEMBLY,16,{"shifts": 3},ACTIVE,2019-06-01
+WC013,fab_trucking,PLT004,ASSY_LINE_2,Assembly Line 2,ASSEMBLY,16,{"shifts": 3},ACTIVE,2019-06-01
+WC014,fab_trucking,PLT004,QA_STATION_1,QA Inspection Station 1,QA,25,{"shifts": 3},ACTIVE,2019-06-01
+WC015,fab_trucking,PLT007,DYNO_3,Dynamometer Test Bay 3,DYNO,10,{"shifts": 3},ACTIVE,2020-05-01
+WC016,fab_trucking,PLT007,DYNO_4,Dynamometer Test Bay 4,DYNO,10,{"shifts": 3},ACTIVE,2020-05-01
+WC017,fab_trucking,PLT001,SHIPPING_DOCK,Shipping Dock,SHIPPING,30,{"shifts": 2},ACTIVE,2020-01-15
+WC018,fab_trucking,PLT004,SHIPPING_DOCK,Shipping Dock,SHIPPING,25,{"shifts": 2},ACTIVE,2019-06-01

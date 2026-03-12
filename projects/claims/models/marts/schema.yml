@@ -1,0 +1,573 @@
+version: 2
+
+models:
+  - name: mart_claim_summary
+    description: >
+      Executive-level warranty claim summary. One row per claim with all
+      enrichments: vehicle context, cluster assignment, workflow lifecycle,
+      and computed flags. Primary analytics table for claims dashboarding.
+    config:
+      tags: ["Gold", "claims-data", "executive-dashboard"]
+    meta:
+      domain: "Warranty Claims"
+      data_owner: "Claims Operations"
+      contains_pii: false
+      grain: "One row per warranty claim"
+      business_purpose: "Provide a single source of truth for warranty claim analysis with full context"
+    columns:
+      - name: claim_id
+        description: Unique warranty claim identifier
+        tags: ["identifier", "primary_key"]
+        tests: [unique, not_null]
+      - name: dealer_id
+        description: Dealer location that filed the claim
+        tags: ["identifier"]
+      - name: vin
+        description: Vehicle Identification Number
+        tags: ["identifier"]
+      - name: fleet_id
+        description: Fleet group assignment
+        tags: ["identifier"]
+      - name: technician_id
+        description: Technician who performed the repair
+        tags: ["identifier"]
+      - name: filed_date
+        description: Claim submission date
+      - name: repair_date
+        description: Repair completion date
+      - name: claim_year
+        description: Calendar year of the claim
+      - name: claim_quarter
+        description: Fiscal quarter (Q1-Q4)
+      - name: mileage_at_repair
+        description: Odometer reading at repair time
+        tags: ["metric"]
+      - name: mileage_bucket
+        description: Mileage segmentation (0-50k, 50k-100k, 100k-200k, 200k+)
+      - name: vehicle_model
+        description: Vehicle make and model
+      - name: model_year
+        description: Vehicle model year
+      - name: claim_type
+        description: Warranty coverage category
+      - name: symptom_reported
+        description: Reported vehicle symptom
+      - name: total_parts_cost
+        description: Parts cost in USD
+        tags: ["metric", "financial-data"]
+        meta:
+          cube_measure: sum
+      - name: total_labor_hours
+        description: Labor hours charged
+        tags: ["metric"]
+        meta:
+          cube_measure: sum
+      - name: total_labor_cost
+        description: Labor cost in USD
+        tags: ["metric", "financial-data"]
+        meta:
+          cube_measure: sum
+      - name: total_claim_amount
+        description: Total claim value in USD
+        tags: ["metric", "financial-data"]
+        meta:
+          cube_measure: sum
+      - name: num_line_items
+        description: Number of repair line items
+        tags: ["metric"]
+      - name: status
+        description: Current claim processing status
+      - name: submission_channel
+        description: Claim submission method
+      - name: campaign_id
+        description: Campaign/recall identifier (null if not campaign)
+        tags: ["identifier"]
+      - name: pre_authorized
+        description: Whether repair was pre-authorized
+      - name: risk_score
+        description: Fraud/anomaly risk score (0-100)
+        tags: ["metric"]
+        meta:
+          cube_measure: avg
+      - name: is_anomaly
+        description: Whether claim is a statistical anomaly
+      - name: anomaly_tier
+        description: Anomaly severity tier
+      - name: anomaly_flags
+        description: Anomaly flag reasons
+      - name: days_to_warranty_end
+        description: Days remaining on warranty at filing
+        tags: ["metric"]
+      - name: prior_claims_on_vin
+        description: Historical claim count for this VIN
+        tags: ["metric"]
+      - name: vehicle_class
+        description: FHWA vehicle weight class
+      - name: engine_type
+        description: Engine make and model
+      - name: transmission
+        description: Transmission type
+      - name: warranty_type
+        description: Warranty coverage type
+      - name: lifecycle_stage
+        description: Vehicle lifecycle stage
+      - name: production_plant
+        description: Manufacturing plant
+      - name: warranty_active_at_filing
+        description: Whether warranty was active at time of filing
+      - name: cluster_id
+        description: ML behavioral cluster name
+      - name: cluster_outlier
+        description: Whether claim is a cluster outlier
+      - name: claim_amount_z_score
+        description: Z-score of claim amount within cluster
+        tags: ["metric"]
+      - name: final_status
+        description: Final workflow status from audit trail
+      - name: submitted_at
+        description: Submission timestamp
+      - name: resolved_at
+        description: Resolution timestamp
+      - name: total_actions
+        description: Total workflow actions
+        tags: ["metric"]
+      - name: hours_to_route
+        description: Hours from submission to routing
+        tags: ["metric"]
+        meta:
+          cube_measure: avg
+      - name: hours_to_resolve
+        description: Hours from submission to final resolution
+        tags: ["metric"]
+        meta:
+          cube_measure: avg
+      - name: was_auto_routed
+        description: Whether claim was auto-routed via LOW_RISK_AUTO_APPROVE
+      - name: routed_by
+        description: Actor who routed the claim
+
+  - name: mart_dealer_scorecard
+    description: >
+      Dealer performance scorecard combining actual claim metrics with baseline
+      benchmarks and labor efficiency data. One row per dealer per year for
+      management review and tier classification.
+    config:
+      tags: ["Gold", "dealer-data", "executive-dashboard"]
+    meta:
+      domain: "Warranty Claims"
+      data_owner: "Dealer Operations"
+      contains_pii: false
+      grain: "One row per dealer_id and claim_year"
+      business_purpose: "Evaluate dealer warranty claim performance against peers and standards"
+    columns:
+      - name: dealer_id
+        description: Dealer location identifier
+        tags: ["identifier"]
+        tests: [not_null]
+      - name: claim_year
+        description: Calendar year
+        tests: [not_null]
+      - name: total_claims
+        description: Total warranty claims filed
+        tags: ["metric"]
+        meta:
+          cube_measure: sum
+      - name: total_claim_amount
+        description: Sum of all claim amounts in USD
+        tags: ["metric", "financial-data"]
+        meta:
+          cube_measure: sum
+      - name: avg_claim_amount
+        description: Average claim amount in USD
+        tags: ["metric", "financial-data"]
+        meta:
+          cube_measure: avg
+      - name: avg_labor_hours
+        description: Average labor hours per claim
+        tags: ["metric"]
+        meta:
+          cube_measure: avg
+      - name: avg_parts_cost
+        description: Average parts cost per claim in USD
+        tags: ["metric", "financial-data"]
+        meta:
+          cube_measure: avg
+      - name: approved_count
+        description: Number of approved claims
+        tags: ["metric"]
+      - name: rejected_count
+        description: Number of rejected claims
+        tags: ["metric"]
+      - name: escalated_count
+        description: Number of escalated claims
+        tags: ["metric"]
+      - name: approval_rate_pct
+        description: Percentage of resolved claims approved
+        tags: ["metric"]
+        meta:
+          cube_measure: avg
+      - name: rejection_rate_pct
+        description: Percentage of resolved claims rejected
+        tags: ["metric"]
+      - name: avg_risk_score
+        description: Average fraud/anomaly risk score
+        tags: ["metric"]
+      - name: anomaly_count
+        description: Number of anomaly-flagged claims
+        tags: ["metric"]
+      - name: distinct_vehicles
+        description: Unique vehicles with claims
+        tags: ["metric"]
+      - name: tier
+        description: Dealer performance tier from baselines (Platinum/Gold/Silver)
+        meta:
+          cube_segments:
+            - name: platinum
+              value: Platinum
+            - name: gold
+              value: Gold
+            - name: silver
+              value: Silver
+      - name: avg_labor_vs_peer_pct
+        description: Average labor variance vs peer group
+        tags: ["metric"]
+      - name: avg_cost_vs_peer_pct
+        description: Average cost variance vs peer group
+        tags: ["metric"]
+      - name: total_line_items
+        description: Total claim line items processed
+        tags: ["metric"]
+      - name: pct_over_standard_labor
+        description: Percentage of line items exceeding SRT labor standards
+        tags: ["metric"]
+      - name: pct_high_cost_lines
+        description: Percentage of line items with high cost variance
+        tags: ["metric"]
+      - name: dealer_risk_tier
+        description: >
+          Computed dealer risk classification based on rejection rate and cost variance.
+          HIGH_RISK, MEDIUM_RISK, or LOW_RISK.
+        meta:
+          cube_segments:
+            - name: high_risk
+              value: HIGH_RISK
+            - name: medium_risk
+              value: MEDIUM_RISK
+            - name: low_risk
+              value: LOW_RISK
+
+  - name: mart_vehicle_warranty_analytics
+    description: >
+      Vehicle-level warranty utilization analytics. One row per VIN with
+      aggregated claim history, cost metrics, and warranty coverage analysis.
+    config:
+      tags: ["Gold", "vehicle-data", "executive-dashboard"]
+    meta:
+      domain: "Warranty Claims"
+      data_owner: "Vehicle Engineering"
+      contains_pii: false
+      grain: "One row per VIN"
+      business_purpose: "Analyze vehicle warranty utilization patterns and identify high-cost units"
+    columns:
+      - name: vin
+        description: Vehicle Identification Number
+        tags: ["identifier", "primary_key"]
+        tests: [unique, not_null]
+      - name: vehicle_model
+        description: Vehicle make and model
+      - name: vehicle_class
+        description: FHWA weight classification
+      - name: model_year
+        description: Vehicle model year
+      - name: engine_type
+        description: Engine make and model
+      - name: transmission
+        description: Transmission type
+      - name: warranty_type
+        description: Warranty coverage type
+      - name: lifecycle_stage
+        description: Vehicle lifecycle stage
+      - name: production_plant
+        description: Manufacturing plant
+      - name: warranty_start_date
+        description: Warranty start date
+      - name: warranty_end_date
+        description: Warranty expiration date
+      - name: primary_dealer_id
+        description: Dealer with most claims for this vehicle
+        tags: ["identifier"]
+      - name: total_claims
+        description: Total warranty claims for this vehicle
+        tags: ["metric"]
+        meta:
+          cube_measure: sum
+      - name: total_claim_amount
+        description: Total warranty spend on this vehicle in USD
+        tags: ["metric", "financial-data"]
+        meta:
+          cube_measure: sum
+      - name: avg_claim_amount
+        description: Average claim amount in USD
+        tags: ["metric", "financial-data"]
+        meta:
+          cube_measure: avg
+      - name: total_parts_cost
+        description: Total parts cost in USD
+        tags: ["metric", "financial-data"]
+      - name: total_labor_cost
+        description: Total labor cost in USD
+        tags: ["metric", "financial-data"]
+      - name: distinct_claim_types
+        description: Number of different warranty types used
+        tags: ["metric"]
+      - name: claim_types_used
+        description: Comma-separated list of claim types filed
+      - name: first_claim_date
+        description: Date of earliest claim
+      - name: latest_claim_date
+        description: Date of most recent claim
+      - name: days_between_first_last_claim
+        description: Span in days between first and last claim
+        tags: ["metric"]
+      - name: avg_risk_score
+        description: Average risk score across vehicle claims
+        tags: ["metric"]
+      - name: anomaly_count
+        description: Number of anomaly-flagged claims
+        tags: ["metric"]
+      - name: max_prior_claims
+        description: Maximum prior_claims_on_vin value recorded
+        tags: ["metric"]
+      - name: claims_within_warranty
+        description: Claims filed while warranty was active
+        tags: ["metric"]
+      - name: claims_outside_warranty
+        description: Claims filed after warranty expired
+        tags: ["metric"]
+      - name: min_mileage_at_repair
+        description: Lowest odometer reading at any repair
+        tags: ["metric"]
+      - name: max_mileage_at_repair
+        description: Highest odometer reading at any repair
+        tags: ["metric"]
+      - name: avg_mileage_at_repair
+        description: Average odometer reading across repairs
+        tags: ["metric"]
+
+  - name: mart_anomaly_detection_overview
+    description: >
+      Fraud and anomaly detection dashboard. Filtered to claims with elevated
+      risk scores, anomaly flags, cluster outliers, or extreme z-scores.
+      Each row includes full context for investigation.
+    config:
+      tags: ["Gold", "claims-data", "anomaly-detection"]
+    meta:
+      domain: "Warranty Claims"
+      data_owner: "Claims Analytics"
+      contains_pii: false
+      grain: "One row per suspicious warranty claim"
+      business_purpose: "Surface warranty claims requiring fraud investigation or additional review"
+    columns:
+      - name: claim_id
+        description: Warranty claim identifier
+        tags: ["identifier", "primary_key"]
+        tests: [unique, not_null]
+      - name: dealer_id
+        description: Dealer that filed the claim
+        tags: ["identifier"]
+      - name: vin
+        description: Vehicle Identification Number
+        tags: ["identifier"]
+      - name: fleet_id
+        description: Fleet group
+        tags: ["identifier"]
+      - name: technician_id
+        description: Technician who filed the claim
+        tags: ["identifier"]
+      - name: filed_date
+        description: Claim filing date
+      - name: claim_year
+        description: Calendar year
+      - name: claim_quarter
+        description: Fiscal quarter
+      - name: vehicle_model
+        description: Vehicle make and model
+      - name: claim_type
+        description: Warranty coverage category
+      - name: total_claim_amount
+        description: Total claim value in USD
+        tags: ["metric", "financial-data"]
+        meta:
+          cube_measure: sum
+      - name: total_parts_cost
+        description: Parts cost in USD
+        tags: ["metric", "financial-data"]
+      - name: total_labor_hours
+        description: Labor hours charged
+        tags: ["metric"]
+      - name: num_line_items
+        description: Number of repair line items
+        tags: ["metric"]
+      - name: status
+        description: Current claim status
+      - name: submission_channel
+        description: How the claim was submitted
+      - name: risk_score
+        description: Automated risk score (0-100)
+        tags: ["metric"]
+        meta:
+          cube_measure: avg
+      - name: is_anomaly
+        description: Whether claim is flagged as anomalous
+      - name: anomaly_tier
+        description: Anomaly tier classification
+      - name: anomaly_flags
+        description: Anomaly flag reasons
+      - name: days_to_warranty_end
+        description: Days remaining on warranty
+        tags: ["metric"]
+      - name: prior_claims_on_vin
+        description: Historical claims on this VIN
+        tags: ["metric"]
+      - name: pre_authorized
+        description: Whether repair was pre-authorized
+      - name: cluster_id
+        description: ML cluster name
+      - name: cluster_outlier
+        description: Whether claim is a cluster outlier
+      - name: claim_amount_z_score
+        description: Z-score of claim amount within cluster
+        tags: ["metric"]
+      - name: distance_from_centroid
+        description: Distance from cluster center
+        tags: ["metric"]
+      - name: cluster_avg_claim_amount
+        description: Cluster average claim amount
+        tags: ["metric", "financial-data"]
+      - name: vehicle_class
+        description: Vehicle weight class
+      - name: warranty_type
+        description: Warranty coverage type
+      - name: warranty_active_at_filing
+        description: Whether warranty was active at filing
+      - name: mileage_bucket
+        description: Mileage segmentation bucket
+      - name: final_status
+        description: Final workflow status
+      - name: was_auto_routed
+        description: Whether auto-routed
+      - name: hours_to_resolve
+        description: Hours from submission to resolution
+        tags: ["metric"]
+      - name: total_actions
+        description: Total workflow actions
+        tags: ["metric"]
+      - name: anomaly_severity
+        description: >
+          Computed severity based on risk_score.
+          CRITICAL (>70), HIGH (>50), MEDIUM (>30), LOW (<=30).
+        meta:
+          cube_segments:
+            - name: critical
+              value: CRITICAL
+            - name: high
+              value: HIGH
+            - name: medium
+              value: MEDIUM
+            - name: low
+              value: LOW
+      - name: amount_vs_cluster_avg
+        description: Dollar difference between claim amount and cluster average
+        tags: ["metric", "financial-data"]
+
+  - name: mart_part_reliability_report
+    description: >
+      Part reliability and failure analysis report. Each row is a part for a
+      specific vehicle model and year, comparing claim-derived failure rates
+      with engineering predictions from the Part Failure Patterns (PFP) reference.
+    config:
+      tags: ["Gold", "reliability-data", "engineering-dashboard"]
+    meta:
+      domain: "Warranty Claims"
+      data_owner: "Vehicle Engineering"
+      contains_pii: false
+      grain: "One row per part_number, model_name, and model_year"
+      business_purpose: "Identify parts failing above expected rates for engineering action and supplier review"
+    columns:
+      - name: part_number
+        description: Part catalog number
+        tests: [not_null]
+      - name: part_description
+        description: Human-readable part name (from PFP reference, null if no match)
+      - name: model_name
+        description: Vehicle model
+        tests: [not_null]
+      - name: model_year
+        description: Vehicle model year
+        tests: [not_null]
+      - name: actual_claim_count
+        description: Number of warranty claim line items for this part
+        tags: ["metric"]
+        meta:
+          cube_measure: sum
+      - name: distinct_claims
+        description: Number of unique claims involving this part
+        tags: ["metric"]
+      - name: total_part_cost
+        description: Total parts cost from claims in USD
+        tags: ["metric", "financial-data"]
+        meta:
+          cube_measure: sum
+      - name: avg_unit_cost
+        description: Average unit cost per part in USD
+        tags: ["metric", "financial-data"]
+        meta:
+          cube_measure: avg
+      - name: avg_labor_hours
+        description: Average labor hours per replacement
+        tags: ["metric"]
+      - name: vehicles_in_population
+        description: Installed base count (from PFP)
+        tags: ["metric"]
+      - name: expected_failure_rate_per_1000
+        description: Engineering-predicted failure rate per 1,000 vehicles
+        tags: ["metric"]
+      - name: pfp_actual_failure_count
+        description: PFP-tracked actual failures
+        tags: ["metric"]
+      - name: pfp_actual_failure_rate
+        description: PFP-tracked failure rate per 1,000 vehicles
+        tags: ["metric"]
+      - name: pfp_deviation_pct
+        description: PFP deviation from expected rate
+        tags: ["metric"]
+      - name: trend
+        description: Failure trend from PFP (Stable/Increasing/Decreasing/Spike)
+      - name: period
+        description: PFP fiscal year period
+      - name: computed_failure_rate_per_1000
+        description: Failure rate computed from claim data and population
+        tags: ["metric"]
+        meta:
+          cube_measure: avg
+      - name: computed_deviation_pct
+        description: Deviation from expected computed from claim data
+        tags: ["metric"]
+      - name: reliability_rating
+        description: >
+          Part reliability classification based on computed deviation.
+          CRITICAL (>30% deviation), WARNING (>10%), GOOD (<=10%), UNKNOWN (no data).
+        meta:
+          cube_segments:
+            - name: critical
+              value: CRITICAL
+            - name: warning
+              value: WARNING
+            - name: good
+              value: GOOD
+            - name: unknown
+              value: UNKNOWN
+      - name: cost_impact_tier
+        description: >
+          Cost impact classification based on total part cost.
+          HIGH_IMPACT (>$50k), MEDIUM_IMPACT (>$10k), LOW_IMPACT (<=10k).

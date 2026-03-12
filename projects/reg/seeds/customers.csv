@@ -1,0 +1,21 @@
+customer_id,customer_name,region,industry,contact_email,active_since
+CUST-001,Alpha Assembly Solutions,EMEA,Electronics Manufacturing,procurement@alpha-assembly.com,2018-03-15
+CUST-002,Enthone,Americas,Surface Treatment,compliance@enthone.com,2017-06-01
+CUST-003,Coventya,EMEA,Chemical Manufacturing,regulatory@coventya.com,2019-01-20
+CUST-004,Electrolube,EMEA,Electronics Manufacturing,sales@electrolube.co.uk,2016-09-10
+CUST-005,Kester,Americas,Electronics Manufacturing,info@kester.com,2015-11-30
+CUST-006,Samsung Electronics,Asia,Electronics Manufacturing,reg.affairs@samsung.com,2020-02-14
+CUST-007,Technoprobe,EMEA,Electronics Manufacturing,quality@technoprobe.com,2021-07-22
+CUST-008,Hisconic,Asia,Electronics Manufacturing,compliance@hisconic.com,2022-04-05
+CUST-009,TE Connectivity,Americas,Electronics Manufacturing,ehs@te.com,2016-01-18
+CUST-010,MacDermid,Americas,Surface Treatment,regulatory@macdermid.com,2014-08-25
+CUST-011,Atotech,EMEA,Surface Treatment,product.stewardship@atotech.com,2017-03-12
+CUST-012,Henkel,EMEA,Adhesives,sustainability@henkel.com,2013-05-07
+CUST-013,BASF,EMEA,Chemical Manufacturing,reach@basf.com,2012-10-01
+CUST-014,Dow Chemical,Americas,Chemical Manufacturing,product.safety@dow.com,2014-02-28
+CUST-015,3M,Americas,Chemical Manufacturing,ehs.compliance@3m.com,2015-07-19
+CUST-016,Volvo,EMEA,Automotive,substances@volvo.com,2018-11-03
+CUST-017,Honeywell,Americas,Aerospace,regulatory@honeywell.com,2016-06-15
+CUST-018,DuPont,Americas,Chemical Manufacturing,stewardship@dupont.com,2013-09-22
+CUST-019,Solvay,EMEA,Chemical Manufacturing,compliance@solvay.com,2019-04-11
+CUST-020,Arkema,EMEA,Chemical Manufacturing,reach.arkema@arkema.com,2020-08-30

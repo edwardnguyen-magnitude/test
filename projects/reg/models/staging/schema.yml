@@ -1,0 +1,293 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: >
+      Cleaned customer data from ESI regulatory compliance operations.
+      Standardizes region codes to uppercase and normalizes email addresses.
+    config:
+      tags: ["Bronze", "customer-data"]
+    meta:
+      domain: "Regulatory Compliance"
+      data_owner: "ESI Regulatory Affairs"
+      contains_pii: true
+    columns:
+      - name: customer_id
+        description: Unique customer identifier (CUST-NNN format)
+        tags: ["identifier"]
+        tests: [unique, not_null]
+      - name: customer_name
+        description: Legal or trading name of the customer organization
+        tags: ["pii"]
+      - name: region
+        description: Geographic region normalized to uppercase (EMEA, AMERICAS, ASIA)
+        tests:
+          - accepted_values:
+              values: ['EMEA', 'AMERICAS', 'ASIA']
+      - name: industry
+        description: Primary industry classification of the customer
+      - name: contact_email
+        description: Regulatory compliance contact email address, normalized to lowercase
+        tags: ["pii"]
+      - name: active_since_date
+        description: Date the customer relationship was established, cast from string to date type
+
+  - name: stg_products
+    description: >
+      ESI chemical products across business units. Trims whitespace from descriptions
+      and preserves product categorization.
+    config:
+      tags: ["Bronze", "product-data"]
+    meta:
+      domain: "Regulatory Compliance"
+      data_owner: "ESI Product Management"
+      contains_pii: false
+    columns:
+      - name: product_id
+        description: Unique product identifier (PRD-NNN format)
+        tags: ["identifier", "primary_key"]
+        tests: [unique, not_null]
+      - name: product_code
+        description: Internal product code used for identification and ordering
+      - name: product_description
+        description: Human-readable product name, trimmed of leading/trailing whitespace
+      - name: business_unit
+        description: ESI business unit that manufactures this product (Alpha, Enthone, Coventya, Electrolube, Kester, MacDermid)
+        tests:
+          - accepted_values:
+              values: ['Alpha', 'Enthone', 'Coventya', 'Electrolube', 'Kester', 'MacDermid']
+      - name: product_category
+        description: Product classification category (e.g., Soldering Materials, Surface Finishing, Conformal Coatings)
+      - name: cas_registry
+        description: CAS registry number for single-substance products, or 'mixture' for multi-component formulations
+        tags: ["chemical-data"]
+
+  - name: stg_regulatory_lists
+    description: >
+      Regulatory substance restriction lists tracked globally. Normalizes region codes
+      to uppercase and casts date/count fields to proper types.
+    config:
+      tags: ["Bronze", "regulatory-data"]
+    meta:
+      domain: "Regulatory Compliance"
+      data_owner: "ESI Regulatory Intelligence"
+      contains_pii: false
+    columns:
+      - name: list_id
+        description: Unique regulatory list identifier (LIST-NNN format)
+        tags: ["identifier", "primary_key"]
+        tests: [unique, not_null]
+      - name: list_code
+        description: Short code for the regulatory list (SVHC, RoHS, TSCA_PBT, CA_PROP65, K_REACH, etc.)
+        tests: [unique, not_null]
+      - name: list_name
+        description: Full official name of the regulatory list
+      - name: region
+        description: Geographic jurisdiction of the regulation, normalized to uppercase
+      - name: authority
+        description: Regulatory authority that maintains the list (e.g., ECHA, EPA, KREACH)
+      - name: last_updated
+        description: Date the regulatory list was last updated, cast to date type
+      - name: substance_count
+        description: Number of substances currently on the regulatory list, cast to integer
+
+  - name: stg_restricted_substances
+    description: >
+      Substances restricted under various regulatory frameworks. Includes CAS numbers,
+      concentration thresholds, and hazard classifications.
+    config:
+      tags: ["Bronze", "substance-data", "regulatory-data"]
+    meta:
+      domain: "Regulatory Compliance"
+      data_owner: "ESI Regulatory Intelligence"
+      contains_pii: false
+    columns:
+      - name: substance_id
+        description: Unique substance identifier (SUB-NNN format)
+        tags: ["identifier", "primary_key"]
+        tests: [unique, not_null]
+      - name: substance_name
+        description: Common chemical name of the substance, trimmed of whitespace
+        tags: ["chemical-data"]
+      - name: cas_number
+        description: Chemical Abstracts Service registry number (e.g., 7439-92-1 for Lead)
+        tags: ["chemical-data"]
+      - name: list_id
+        description: Foreign key to the regulatory list this substance appears on
+        tags: ["identifier"]
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_regulatory_lists')
+              field: list_id
+      - name: threshold_ppm
+        description: Maximum allowed concentration in parts per million, cast to numeric
+        tags: ["chemical-data", "metric"]
+      - name: restriction_type
+        description: Type of regulatory restriction (banned, restricted, declarable, candidate)
+        tests:
+          - accepted_values:
+              values: ['banned', 'restricted', 'declarable', 'candidate']
+      - name: hazard_class
+        description: Hazard classification under regulatory frameworks (e.g., CMR, PBT, vPvB, ED, Toxic)
+
+  - name: stg_product_substances
+    description: >
+      Product-substance composition data with measured concentrations and verification provenance.
+      Links products to the restricted substances they contain.
+    config:
+      tags: ["Bronze", "substance-data", "product-data"]
+    meta:
+      domain: "Regulatory Compliance"
+      data_owner: "ESI Product Stewardship"
+      contains_pii: false
+    columns:
+      - name: product_substance_id
+        description: Unique product-substance link identifier (PS-NNN format)
+        tags: ["identifier", "primary_key"]
+        tests: [unique, not_null]
+      - name: product_id
+        description: Foreign key to the product containing the substance
+        tags: ["identifier"]
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_products')
+              field: product_id
+      - name: substance_id
+        description: Foreign key to the restricted substance found in the product
+        tags: ["identifier"]
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_restricted_substances')
+              field: substance_id
+      - name: concentration_ppm
+        description: Measured concentration of the substance in the product in parts per million, cast to numeric
+        tags: ["chemical-data", "metric"]
+      - name: last_verified_date
+        description: Date the concentration measurement was last verified, cast to date type
+      - name: data_source
+        description: Source of the substance data (e.g., Sphera Cloud, SDS Review, Lab Analysis, Supplier Declaration)
+
+  - name: stg_survey_requests
+    description: >
+      Customer regulatory survey requests with status tracking. Handles empty completed_date
+      values for in-progress surveys.
+    config:
+      tags: ["Bronze", "survey-data"]
+    meta:
+      domain: "Regulatory Compliance"
+      data_owner: "ESI Survey Operations"
+      contains_pii: false
+    columns:
+      - name: survey_id
+        description: Unique survey request identifier (SRV-NNN format)
+        tags: ["identifier"]
+        tests: [unique, not_null]
+      - name: customer_id
+        description: Foreign key to the requesting customer
+        tags: ["identifier"]
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: region
+        description: Region the survey pertains to, normalized to uppercase
+      - name: survey_type
+        description: Regulatory framework being assessed (SVHC, RoHS, TSCA_PBT, CA_PROP65, K_REACH, etc.)
+      - name: complexity
+        description: Survey complexity level based on substance count and regulatory scope
+        tests:
+          - accepted_values:
+              values: ['easy', 'mid-complex', 'complex']
+      - name: product_count
+        description: Number of products included in this survey, cast to integer
+        tags: ["metric"]
+      - name: status
+        description: Current status of the survey request
+        tests:
+          - accepted_values:
+              values: ['completed', 'in_progress', 'pending', 'cancelled']
+      - name: requested_date
+        description: Date the survey was requested by the customer, cast to date
+      - name: due_date
+        description: Contractual due date for survey completion, cast to date
+      - name: completed_date
+        description: Actual date the survey was completed, null if not yet completed (empty strings converted to null)
+      - name: business_unit
+        description: ESI business unit handling this survey
+
+  - name: stg_survey_responses
+    description: >
+      Individual compliance responses per product-substance within a survey.
+      Each row is one analyst's determination for a product-substance combination.
+    config:
+      tags: ["Bronze", "survey-data"]
+    meta:
+      domain: "Regulatory Compliance"
+      data_owner: "ESI Survey Operations"
+      contains_pii: false
+    columns:
+      - name: response_id
+        description: Unique response identifier (RSP-NNN format)
+        tags: ["identifier"]
+        tests: [unique, not_null]
+      - name: survey_id
+        description: Foreign key to the parent survey request
+        tags: ["identifier"]
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_survey_requests')
+              field: survey_id
+      - name: product_id
+        description: Product being assessed for compliance
+        tags: ["identifier"]
+      - name: substance_id
+        description: Substance being checked for regulatory compliance
+        tags: ["identifier"]
+      - name: compliance_status
+        description: Compliance determination result (compliant, non_compliant, flagged, under_review)
+        tests:
+          - accepted_values:
+              values: ['compliant', 'non_compliant', 'flagged', 'under_review']
+      - name: declared_concentration_ppm
+        description: Declared concentration of substance in the product in parts per million, cast to numeric
+        tags: ["chemical-data", "metric"]
+      - name: response_date
+        description: Date the compliance response was submitted by the analyst
+      - name: analyst
+        description: Name of the regulatory compliance analyst who performed the assessment
+
+  - name: stg_regulatory_data_sources
+    description: >
+      Regulatory intelligence data sources including government databases, commercial platforms,
+      and internal systems. Normalizes region codes and casts date fields.
+    config:
+      tags: ["Bronze", "regulatory-data"]
+    meta:
+      domain: "Regulatory Compliance"
+      data_owner: "ESI Regulatory Intelligence"
+      contains_pii: false
+    columns:
+      - name: source_id
+        description: Unique data source identifier (SRC-NNN format)
+        tags: ["identifier"]
+        tests: [unique, not_null]
+      - name: source_name
+        description: Name of the regulatory data source, trimmed of whitespace
+      - name: source_type
+        description: Category of data source (government, commercial, news, consultant, internal)
+        tests:
+          - accepted_values:
+              values: ['government', 'commercial', 'news', 'consultant', 'internal']
+      - name: region
+        description: Geographic region the data source covers, normalized to uppercase
+      - name: url
+        description: URL or access point for the data source
+      - name: update_frequency
+        description: How often the data source publishes updates (daily, weekly, monthly, quarterly, annually)
+      - name: last_checked
+        description: Date the data source was last checked for updates, cast to date type

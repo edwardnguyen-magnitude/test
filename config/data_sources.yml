@@ -1,0 +1,20 @@
+database:
+  type: postgres
+  host: ${DBT_HOST:-localhost}
+  port: ${DBT_PORT:-5432}
+  database: ${DBT_DATABASE}
+  user: ${DBT_USER:-postgres}
+  schemas:
+  - raw
+  - staging
+  - intermediate
+  - marts
+  - gold
+ingestion:
+  mode: airbyte
+airbyte:
+  connections:
+  - name: source-to-warehouse
+    connection_id: 276b1718-cfe4-498f-a184-ec9dc3537ed7
+  - name: marts-to-gold
+    connection_id: 6ebb08a9-7104-43dd-b5ab-7f95e5ca6200

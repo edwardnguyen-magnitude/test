@@ -1,0 +1,609 @@
+version: 2
+
+models:
+  - name: stg_claims
+    description: >
+      Cleaned and type-cast warranty claims. Each row is a single warranty claim
+      filed by a dealer technician for a heavy truck repair. Booleans converted
+      from Y/N flags, empty strings nullified, dates and numerics properly cast.
+    config:
+      tags: ["Bronze", "claims-data"]
+    meta:
+      domain: "Warranty Claims"
+      data_owner: "Claims Operations"
+      contains_pii: false
+    columns:
+      - name: claim_id
+        description: Unique warranty claim identifier (WC-XXXXXXXXXX format)
+        tags: ["identifier", "primary_key"]
+        tests: [unique, not_null]
+      - name: dealer_id
+        description: Dealer location that filed the claim (DLR-XXX format)
+        tags: ["identifier"]
+        tests: [not_null]
+      - name: vin
+        description: Vehicle Identification Number linked to this claim
+        tags: ["identifier"]
+        tests: [not_null]
+      - name: fleet_id
+        description: Fleet group the vehicle belongs to (FLT-XXXX format)
+        tags: ["identifier"]
+      - name: technician_id
+        description: Dealer technician who performed the repair (DLR-XXX-TECH-XX format)
+        tags: ["identifier"]
+        tests: [not_null]
+      - name: filed_date
+        description: Date the warranty claim was submitted to the system
+        tests: [not_null]
+      - name: repair_date
+        description: Date the physical repair was completed on the vehicle
+        tests: [not_null]
+      - name: claim_year
+        description: Calendar year extracted from the claim filing date
+      - name: claim_month
+        description: Calendar month (1-12) extracted from the claim filing date
+      - name: claim_quarter
+        description: Fiscal quarter designation (Q1-Q4)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Q1', 'Q2', 'Q3', 'Q4']
+      - name: mileage_at_repair
+        description: Vehicle odometer reading in miles at the time of repair
+        tags: ["metric"]
+      - name: vehicle_model
+        description: Vehicle make and model (e.g., Freightliner Cascadia, Western Star 49X)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Freightliner 108SD', 'Freightliner 114SD', 'Freightliner Cascadia', 'Freightliner M2 106', 'Freightliner M2 112', 'Western Star 47X', 'Western Star 49X']
+      - name: model_year
+        description: Vehicle model year (e.g., 2021-2024)
+      - name: claim_type
+        description: Category of warranty coverage under which this claim is filed
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Base Warranty', 'Extended Warranty', 'Emissions Warranty', 'Goodwill', 'Campaign/Recall', 'Policy Adjustment']
+      - name: symptom_reported
+        description: Free-text description of the vehicle symptom reported by the driver or technician
+      - name: total_parts_cost
+        description: Total cost of all replacement parts on this claim in USD
+        tags: ["metric", "financial-data"]
+      - name: total_labor_hours
+        description: Total technician labor hours charged across all line items
+        tags: ["metric"]
+      - name: total_labor_cost
+        description: Total labor cost in USD (labor_hours x shop rate)
+        tags: ["metric", "financial-data"]
+      - name: total_claim_amount
+        description: Total claim value in USD (parts cost + labor cost)
+        tags: ["metric", "financial-data"]
+      - name: num_line_items
+        description: Number of individual repair operations (line items) on this claim
+        tags: ["metric"]
+      - name: technician_narrative
+        description: Free-form technician notes describing diagnostic steps and work performed
+      - name: status
+        description: Current claim processing status in the workflow
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Submitted', 'Approved', 'Rejected', 'Escalated', 'Under Review']
+      - name: risk_score
+        description: Automated fraud/anomaly risk score (0-100 scale, higher = more suspicious)
+        tags: ["metric"]
+      - name: is_anomaly
+        description: Whether the claim was flagged as a statistical anomaly (boolean, cast from Y/N)
+      - name: anomaly_tier
+        description: Severity tier for anomalous claims (null if not flagged)
+      - name: anomaly_flags
+        description: Descriptive anomaly flag reasons (null if not flagged)
+      - name: days_to_warranty_end
+        description: Days remaining until warranty expiration at time of filing (negative = warranty expired)
+        tags: ["metric"]
+      - name: prior_claims_on_vin
+        description: Historical count of previous warranty claims on this VIN
+        tags: ["metric"]
+      - name: campaign_id
+        description: Campaign/recall identifier (CAMP-XXXX format, null if not a campaign claim)
+        tags: ["identifier"]
+      - name: pre_authorized
+        description: Whether the repair was pre-authorized before work began (boolean, cast from Y/N)
+      - name: submission_channel
+        description: Method used to submit the claim to the warranty system
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['PRISM Batch Upload', 'PRISM Manual Entry', 'Mobile App', 'API']
+
+  - name: stg_claim_lines
+    description: >
+      Cleaned claim line items. Each row is a single repair operation within a
+      warranty claim, including the part replaced, VMRS codes, labor hours,
+      and variance metrics against standard repair times.
+    config:
+      tags: ["Bronze", "claims-data", "repair-data"]
+    meta:
+      domain: "Warranty Claims"
+      data_owner: "Claims Operations"
+      contains_pii: false
+    columns:
+      - name: claim_line_id
+        description: Unique line item identifier (CL-XXXXXX format)
+        tags: ["identifier", "primary_key"]
+        tests: [unique, not_null]
+      - name: claim_id
+        description: Parent warranty claim this line belongs to
+        tags: ["identifier"]
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_claims')
+                field: claim_id
+      - name: line_number
+        description: Sequential line number within the parent claim (1-based)
+      - name: part_number
+        description: Internal part catalog number (e.g., A-001-030-60-12)
+        tests: [not_null]
+      - name: vmrs_component_code
+        description: >
+          VMRS (Vehicle Maintenance Reporting Standards) component system code.
+          Two-digit code identifying the vehicle system (e.g., 032=Cooling, 043=Electrical).
+        tags: ["vmrs-data"]
+        tests: [not_null]
+      - name: vmrs_cause_code
+        description: VMRS failure cause code (01-07) classifying why the component failed
+        tags: ["vmrs-data"]
+      - name: vmrs_correction_code
+        description: VMRS correction method code (01-09) classifying how the repair was done
+        tags: ["vmrs-data"]
+      - name: quantity
+        description: Number of parts used for this line item
+      - name: unit_cost
+        description: Cost per unit of the replacement part in USD
+        tags: ["metric", "financial-data"]
+      - name: line_total
+        description: Total parts cost for this line (quantity x unit_cost) in USD
+        tags: ["metric", "financial-data"]
+      - name: labor_hours
+        description: Actual technician labor hours for this repair operation
+        tags: ["metric"]
+      - name: srt_standard_hours
+        description: Expected labor hours per Standard Repair Time guidelines
+        tags: ["metric"]
+      - name: labor_variance_pct
+        description: >
+          Percentage variance of actual labor vs SRT standard.
+          Positive = over standard, negative = under standard.
+        tags: ["metric"]
+      - name: cost_variance_pct
+        description: >
+          Percentage variance of actual parts cost vs expected cost.
+          Positive = over expected, negative = under expected.
+        tags: ["metric"]
+      - name: repair_type
+        description: Complexity classification of the repair operation
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Standard', 'Complex']
+
+  - name: stg_claim_attachments
+    description: >
+      Cleaned claim attachment metadata. Each row is a document or photo
+      uploaded as evidence for a warranty claim. Includes perceptual hashing
+      for duplicate image detection.
+    config:
+      tags: ["Bronze", "claims-data", "attachment-data"]
+    meta:
+      domain: "Warranty Claims"
+      data_owner: "Claims Operations"
+      contains_pii: false
+    columns:
+      - name: attachment_id
+        description: Unique attachment identifier (ATT-XXXXXX format)
+        tags: ["identifier", "primary_key"]
+        tests: [unique, not_null]
+      - name: claim_id
+        description: Parent warranty claim this attachment belongs to
+        tags: ["identifier"]
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_claims')
+                field: claim_id
+      - name: file_name
+        description: Original filename as uploaded (e.g., repair_photo_1.jpg, invoice_3.pdf)
+      - name: file_type
+        description: File format (JPEG for photos, PDF for documents)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['JPEG', 'PDF']
+      - name: file_size_kb
+        description: File size in kilobytes
+        tags: ["metric"]
+      - name: upload_date
+        description: Date the file was uploaded to the claim
+      - name: perceptual_hash
+        description: 64-character hex perceptual hash for image similarity comparison
+      - name: ssim_match_score
+        description: Structural Similarity Index score (0-1) for duplicate detection. Higher = more similar to known images.
+        tags: ["metric"]
+      - name: is_duplicate_flag
+        description: Whether this attachment was flagged as a potential duplicate (boolean, cast from Y/N)
+
+  - name: stg_claim_audit_log
+    description: >
+      Cleaned claim workflow audit trail. Each row is a status transition or
+      action taken on a warranty claim, from initial submission through
+      routing and final resolution.
+    config:
+      tags: ["Bronze", "claims-data", "audit-data"]
+    meta:
+      domain: "Warranty Claims"
+      data_owner: "Claims Operations"
+      contains_pii: false
+    columns:
+      - name: audit_id
+        description: Unique audit event identifier (AUD-XXXXXX format)
+        tags: ["identifier", "primary_key"]
+        tests: [unique, not_null]
+      - name: claim_id
+        description: Warranty claim this audit event belongs to
+        tags: ["identifier"]
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_claims')
+                field: claim_id
+      - name: action
+        description: >
+          Workflow action performed: Submitted (initial filing), Routed (assigned
+          to reviewer), Approved (claim accepted), Rejected (claim denied)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Submitted', 'Routed', 'Approved', 'Rejected']
+      - name: action_date
+        description: Timestamp when the action was performed
+        tests: [not_null]
+      - name: performed_by
+        description: >
+          Actor who performed the action. Format varies by role: technician ID
+          (DLR-XXX-TECH-XX), reviewer ID (REVIEWER-XX), or SYSTEM for automated actions.
+      - name: role
+        description: Role of the actor performing the action
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Dealer Technician', 'Claim Processor', 'Automated']
+      - name: previous_status
+        description: Claim status before this action (null for initial submission)
+      - name: new_status
+        description: Claim status after this action was applied
+      - name: notes
+        description: Free-form notes about the action (e.g., risk score details, routing info)
+      - name: routing_rule
+        description: >
+          Name of the automated routing rule applied, if any.
+          Currently only LOW_RISK_AUTO_APPROVE is used. Null when no rule applied.
+
+  - name: stg_cluster_assignments
+    description: >
+      Cleaned ML clustering results. Each claim is assigned to exactly one
+      behavioral pattern cluster based on claim characteristics. Used for
+      anomaly detection and pattern-based claim analysis.
+    config:
+      tags: ["Bronze", "claims-data", "analytics-data"]
+    meta:
+      domain: "Warranty Claims"
+      data_owner: "Claims Analytics"
+      contains_pii: false
+    columns:
+      - name: claim_id
+        description: Warranty claim identifier (1:1 relationship with stg_claims)
+        tags: ["identifier", "primary_key"]
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_claims')
+                field: claim_id
+      - name: cluster_id
+        description: >
+          Descriptive cluster name reflecting the claim pattern (e.g.,
+          Electrical-Intermittent-Faults, Cooling-Summer-Sun-Belt,
+          Campaign-Related-Defect, Brake-Rust-Belt-Winter)
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                - 'Brake-Rust-Belt-Winter'
+                - 'Cab-Body-Regional-Distribution'
+                - 'Campaign-Related-Defect'
+                - 'Cooling-Summer-Sun-Belt'
+                - 'Drivetrain-Construction-Fleet'
+                - 'Electrical-Intermittent-Faults'
+                - 'Emission-DPF-Regen-Failure'
+                - 'Emission-High-Mileage-Cascadia'
+                - 'Engine-Extended-Warranty'
+                - 'Fuel-System-Cold-Start'
+                - 'Transmission-Class8-Heavy-Use'
+      - name: cluster_size
+        description: Total number of claims assigned to this cluster
+        tags: ["metric"]
+      - name: distance_from_centroid
+        description: >
+          Euclidean distance of this claim from its cluster center. Higher values
+          indicate the claim is less typical of its cluster pattern.
+        tags: ["metric"]
+      - name: is_outlier
+        description: Whether this claim is a statistical outlier within its cluster (boolean, cast from Y/N)
+      - name: cluster_avg_claim_amount
+        description: Mean claim amount in USD for all claims in this cluster
+        tags: ["metric", "financial-data"]
+      - name: cluster_std_claim_amount
+        description: Standard deviation of claim amounts in USD within this cluster
+        tags: ["metric", "financial-data"]
+      - name: claim_amount_z_score
+        description: >
+          Z-score of this claim's total amount relative to its cluster distribution.
+          Values above 2 or below -2 are statistically unusual.
+        tags: ["metric"]
+
+  - name: stg_vehicles
+    description: >
+      Cleaned vehicle master data. Each row is a unique vehicle (by VIN) with
+      specifications, warranty coverage details, and lifecycle stage. This is
+      a slowly-changing dimension.
+    config:
+      tags: ["Bronze", "vehicle-data"]
+    meta:
+      domain: "Warranty Claims"
+      data_owner: "Vehicle Engineering"
+      contains_pii: false
+    columns:
+      - name: vin
+        description: Vehicle Identification Number (primary key)
+        tags: ["identifier", "primary_key"]
+        tests: [unique, not_null]
+      - name: dealer_id
+        description: Dealer location where the vehicle is registered
+        tags: ["identifier"]
+      - name: fleet_id
+        description: Fleet group the vehicle is assigned to
+        tags: ["identifier"]
+      - name: model_name
+        description: Vehicle make and model (e.g., Freightliner Cascadia, Western Star 49X)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Freightliner 108SD', 'Freightliner 114SD', 'Freightliner Cascadia', 'Freightliner M2 106', 'Freightliner M2 112', 'Western Star 47X', 'Western Star 49X']
+      - name: vehicle_class
+        description: FHWA vehicle weight classification (Class 6=medium, 7=heavy, 8=heavy-duty)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Class 6', 'Class 7', 'Class 8']
+      - name: model_year
+        description: Vehicle model year
+      - name: engine_type
+        description: Engine make and model installed in this vehicle
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Cummins X12', 'Cummins X15', 'DD13', 'DD15', 'DD16']
+      - name: transmission
+        description: Transmission type installed in this vehicle
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Allison 4000', 'DT12', 'Eaton Fuller 18-speed']
+      - name: warranty_type
+        description: Active warranty coverage type for this vehicle
+        tests:
+          - accepted_values:
+              arguments:
+                values:
+                - 'Base Warranty'
+                - 'Chassis Coverage'
+                - 'Detroit OE Advantage'
+                - 'Extended Engine EW1'
+                - 'Extended Engine EW2'
+                - 'Extended Engine EW3'
+                - 'Extended Engine EW4'
+                - 'Extended Next'
+                - 'Extended OPTIMUM'
+      - name: warranty_start_date
+        description: Date warranty coverage began
+      - name: warranty_end_date
+        description: Date warranty coverage expires
+      - name: current_mileage
+        description: Last known odometer reading in miles
+        tags: ["metric"]
+      - name: lifecycle_stage
+        description: >
+          Current vehicle lifecycle classification based on warranty status and mileage.
+          New = recently delivered, Mid-Life = active use, End-of-Warranty = approaching expiration.
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['New', 'Mid-Life', 'End-of-Warranty']
+      - name: production_plant
+        description: Manufacturing plant where the vehicle was built
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Portland', 'Cleveland', 'Mount Holly', 'Santiago']
+      - name: build_date
+        description: Date the vehicle was manufactured
+      - name: production_batch
+        description: Production batch identifier (PLANT-YYYYMM-NN format, e.g., POR-202401-19)
+
+  - name: stg_dealer_baselines
+    description: >
+      Cleaned dealer performance benchmarks. Each row is a dealer's performance
+      metrics for a specific repair category and year, including peer group
+      comparisons and tier classification.
+    config:
+      tags: ["Bronze", "dealer-data", "benchmark-data"]
+    meta:
+      domain: "Warranty Claims"
+      data_owner: "Dealer Operations"
+      contains_pii: false
+    columns:
+      - name: dealer_id
+        description: Dealer location identifier (DLR-XXX format)
+        tags: ["identifier"]
+        tests: [not_null]
+      - name: year
+        description: Performance benchmark year
+        tests: [not_null]
+      - name: category
+        description: VMRS repair category (e.g., Cooling, Drivetrain, Electrical, Engine)
+        tags: ["vmrs-data"]
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Brake', 'Cab/Body', 'Cooling', 'Drivetrain', 'Electrical', 'Emission', 'Engine', 'Fuel', 'Transmission']
+      - name: claim_count
+        description: Number of claims in this category for the dealer in this year
+        tags: ["metric"]
+      - name: avg_labor_hours
+        description: Dealer's average labor hours per claim in this category
+        tags: ["metric"]
+      - name: avg_parts_cost
+        description: Dealer's average parts cost per claim in USD
+        tags: ["metric", "financial-data"]
+      - name: peer_avg_labor_hours
+        description: Peer group average labor hours for benchmarking
+        tags: ["metric"]
+      - name: peer_avg_parts_cost
+        description: Peer group average parts cost in USD for benchmarking
+        tags: ["metric", "financial-data"]
+      - name: labor_vs_peer_pct
+        description: >
+          Percentage variance of dealer labor hours vs peer average.
+          Positive = more labor than peers, negative = less labor.
+        tags: ["metric"]
+      - name: cost_vs_peer_pct
+        description: >
+          Percentage variance of dealer parts cost vs peer average.
+          Positive = more expensive than peers, negative = less expensive.
+        tags: ["metric"]
+      - name: rejection_rate_pct
+        description: Percentage of this dealer's claims rejected in this category
+        tags: ["metric"]
+      - name: tier
+        description: >
+          Dealer performance tier based on overall metrics.
+          Platinum = top performers, Gold = good, Silver = needs improvement.
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Platinum', 'Gold', 'Silver']
+
+  - name: stg_srt
+    description: >
+      Cleaned Standard Repair Times reference data. Each row defines the expected
+      labor hours for a specific repair operation by VMRS component/cause code
+      and repair complexity. Used for labor variance analysis.
+    config:
+      tags: ["Bronze", "reference-data"]
+    meta:
+      domain: "Warranty Claims"
+      data_owner: "Warranty Engineering"
+      contains_pii: false
+    columns:
+      - name: srt_id
+        description: Unique SRT record identifier (SRT-XXXX format)
+        tags: ["identifier", "primary_key"]
+        tests: [unique, not_null]
+      - name: vmrs_component_code
+        description: VMRS component system code this standard applies to
+        tags: ["vmrs-data"]
+        tests: [not_null]
+      - name: vmrs_cause_code
+        description: VMRS failure cause code this standard applies to
+        tags: ["vmrs-data"]
+      - name: repair_type
+        description: Repair complexity classification (Standard or Complex)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Standard', 'Complex']
+      - name: standard_labor_hours
+        description: Expected labor hours for this repair operation
+        tags: ["metric"]
+      - name: labor_hour_tolerance_pct
+        description: Acceptable percentage variance from standard hours (currently 20% for all)
+        tags: ["metric"]
+      - name: applicable_models
+        description: >
+          Comma-separated list of vehicle models this standard applies to,
+          or 'All' for universal applicability
+      - name: effective_date
+        description: Date this standard became effective
+      - name: last_updated
+        description: Date of most recent update to this standard
+
+  - name: stg_pfp
+    description: >
+      Cleaned Part Failure Patterns reference data. Each row tracks the expected
+      vs actual failure rate for a specific part on a specific vehicle model and
+      year. Used for predictive maintenance and reliability analysis.
+    config:
+      tags: ["Bronze", "reference-data", "reliability-data"]
+    meta:
+      domain: "Warranty Claims"
+      data_owner: "Vehicle Engineering"
+      contains_pii: false
+    columns:
+      - name: pfp_id
+        description: Unique part failure pattern identifier (PFP-XXXXX format)
+        tags: ["identifier", "primary_key"]
+        tests: [unique, not_null]
+      - name: part_number
+        description: Part catalog number
+        tests: [not_null]
+      - name: part_description
+        description: Human-readable part name (e.g., EGR Cooler Assembly, Turbo Actuator)
+      - name: model_name
+        description: Vehicle model this failure pattern applies to
+      - name: model_year
+        description: Vehicle model year this failure pattern applies to
+      - name: vehicles_in_population
+        description: Total number of vehicles in the installed base for this model/year
+        tags: ["metric"]
+      - name: expected_failure_rate_per_1000
+        description: Engineering-predicted failures per 1,000 vehicles
+        tags: ["metric"]
+      - name: actual_failure_count
+        description: Observed number of failures in the field
+        tags: ["metric"]
+      - name: actual_failure_rate_per_1000
+        description: Observed failure rate per 1,000 vehicles
+        tags: ["metric"]
+      - name: deviation_pct
+        description: >
+          Percentage deviation of actual vs expected failure rate.
+          Positive = failing more than expected, negative = failing less.
+        tags: ["metric"]
+      - name: trend
+        description: Failure rate trend direction over time
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Stable', 'Increasing', 'Decreasing', 'Spike']
+      - name: period
+        description: Fiscal year period (YYYY-FY format, e.g., 2023-FY)
+      - name: last_updated
+        description: Date of most recent data update for this pattern

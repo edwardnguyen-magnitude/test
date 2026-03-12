@@ -1,0 +1,357 @@
+version: 2
+
+models:
+  - name: stg_fab_trucking__plants
+    description: Staging model for Fab Trucking plant/facility data
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier3
+          glossary:
+            - 'FabTrucking.Plant'
+    columns:
+      - name: plant_id
+        description: Primary key for plant
+        data_tests:
+          - unique
+          - not_null
+      - name: tenant_id
+        description: Tenant identifier for multi-tenant isolation
+        data_tests:
+          - not_null
+      - name: plant_code
+        description: Short code for plant (e.g., FT-DET-01)
+        data_tests:
+          - unique
+          - not_null
+      - name: status
+        description: Plant status (ACTIVE, INACTIVE)
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['ACTIVE', 'INACTIVE']
+
+  - name: stg_fab_trucking__truck_models
+    description: Staging model for truck model master data
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier3
+          glossary:
+            - 'FabTrucking.TruckModel'
+    columns:
+      - name: truck_model_id
+        description: Primary key for truck model
+        data_tests:
+          - unique
+          - not_null
+      - name: model_code
+        description: Model code (e.g., FT-X900)
+        data_tests:
+          - unique
+          - not_null
+      - name: segment
+        description: Truck segment classification
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['HEAVY_DUTY', 'MEDIUM_DUTY', 'LIGHT_DUTY']
+
+  - name: stg_fab_trucking__configurations
+    description: Staging model for truck configurations
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier3
+          glossary:
+            - 'FabTrucking.Configuration'
+    columns:
+      - name: configuration_id
+        description: Primary key for configuration
+        data_tests:
+          - unique
+          - not_null
+      - name: truck_model_id
+        description: Foreign key to truck model
+        data_tests:
+          - not_null
+      - name: market
+        description: Target market for configuration
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['US', 'EU', 'CA', 'MX']
+
+  - name: stg_fab_trucking__workcenters
+    description: Staging model for plant workcenters
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier3
+          glossary:
+            - 'FabTrucking.Workcenter'
+    columns:
+      - name: workcenter_id
+        description: Primary key for workcenter
+        data_tests:
+          - unique
+          - not_null
+      - name: plant_id
+        description: Foreign key to plant
+        data_tests:
+          - not_null
+      - name: area
+        description: Workcenter area type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['ASSEMBLY', 'PAINT', 'QA', 'DYNO', 'SHIPPING']
+
+  - name: stg_fab_trucking__customers
+    description: Staging model for customer master data
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier3
+          glossary:
+            - 'FabTrucking.Customer'
+    columns:
+      - name: customer_id
+        description: Primary key for customer
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_code
+        description: Customer code
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_segment
+        description: Customer segment classification
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['FLEET', 'RETAIL', 'GOV']
+
+  - name: stg_fab_trucking__trucks
+    description: Staging model for truck build records
+    columns:
+      - name: truck_build_id
+        description: Primary key for truck build
+        data_tests:
+          - unique
+          - not_null
+      - name: vin
+        description: Vehicle Identification Number
+        data_tests:
+          - unique
+          - not_null
+      - name: current_status
+        description: Current build status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['IN_BUILD', 'BUILT_OFFLINE', 'READY_FOR_RELEASE', 'SHIPPED', 'DELIVERED']
+
+  - name: stg_fab_trucking__offline_cases
+    description: Staging model for truck offline cases
+    columns:
+      - name: offline_case_id
+        description: Primary key for offline case
+        data_tests:
+          - unique
+          - not_null
+      - name: vin
+        description: Vehicle Identification Number
+        data_tests:
+          - not_null
+      - name: offline_reason_primary
+        description: Primary reason for offline
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['PART_SHORTAGE', 'QA_DELAY', 'SPEC_ISSUE', 'ENGINEERING_BOM', 'DYNO_TEST', 'PAINT', 'OTHER']
+      - name: current_offline_status
+        description: Current status of offline case
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['OPEN', 'IN_PROGRESS', 'WAITING_APPROVAL', 'RESOLVED']
+      - name: priority_band
+        description: Priority classification band
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['GREEN', 'YELLOW', 'RED', 'BLACK']
+
+  - name: stg_fab_trucking__material_shortages
+    description: Staging model for material shortage events
+    columns:
+      - name: shortage_id
+        description: Primary key for shortage
+        data_tests:
+          - unique
+          - not_null
+      - name: shortage_status
+        description: Current shortage status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['OPEN', 'IN_TRANSIT', 'RESOLVED', 'SUBSTITUTE_USED', 'CANCELED']
+      - name: shortage_type
+        description: Type of shortage
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['NO_STOCK', 'LATE_SHIPMENT', 'QUALITY_HOLD']
+      - name: shortage_severity
+        description: Severity of shortage
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
+
+  - name: stg_fab_trucking__inspections
+    description: Staging model for inspection events (canonical schema)
+    columns:
+      - name: inspection_event_id
+        description: Primary key for inspection event (canonical)
+        data_tests:
+          - unique
+          - not_null
+      - name: inspection_type
+        description: Type of inspection
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['FINAL_INSPECTION', 'REWORK_INSPECTION', 'RANDOM_AUDIT']
+      - name: inspection_result
+        description: Inspection result (canonical)
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['PASS', 'FAIL', 'REWORK_REQUIRED']
+
+  - name: stg_fab_trucking__test_results
+    description: Staging model for test results (dyno, road, brake)
+    columns:
+      - name: test_result_id
+        description: Primary key for test result
+        data_tests:
+          - unique
+          - not_null
+      - name: test_type
+        description: Type of test
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['DYNO', 'ROAD_TEST', 'BRAKE_TEST']
+      - name: result
+        description: Test result
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['PASS', 'FAIL', 'INCOMPLETE']
+
+  - name: stg_fab_trucking__approvals
+    description: Staging model for approval events (canonical schema)
+    columns:
+      - name: approval_event_id
+        description: Primary key for approval event (canonical)
+        data_tests:
+          - unique
+          - not_null
+      - name: approval_step_type
+        description: Type of approval step
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['ENGINEERING_REVIEW', 'MATERIALS_CONFIRMATION', 'QA_SIGNOFF', 'BUSINESS_RELEASE']
+      - name: decision
+        description: Approval decision (canonical)
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['PENDING', 'APPROVED', 'REJECTED', 'ESCALATED']
+
+  - name: stg_fab_trucking__defects
+    description: Staging model for defect records
+    columns:
+      - name: defect_id
+        description: Primary key for defect
+        data_tests:
+          - unique
+          - not_null
+      - name: defect_category
+        description: Category of defect
+      - name: severity
+        description: Defect severity
+        data_tests:
+          - not_null
+      - name: detected_at_stage
+        description: Stage where defect was detected
+
+  - name: stg_fab_trucking__paint_operations
+    description: Staging model for paint operation records
+    columns:
+      - name: paint_operation_id
+        description: Primary key for paint operation
+        data_tests:
+          - unique
+          - not_null
+      - name: vin
+        description: Vehicle Identification Number
+        data_tests:
+          - not_null
+      - name: plant_id
+        description: Foreign key to plant where paint occurs
+        data_tests:
+          - not_null
+      - name: workcenter_id
+        description: Foreign key to paint workcenter
+        data_tests:
+          - not_null
+      - name: paint_code
+        description: Paint color/type code
+        data_tests:
+          - not_null
+      - name: paint_result
+        description: Result of paint operation
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['OK', 'REWORK_REQUIRED']
+
+  - name: stg_fab_trucking__warranty_claims
+    description: Staging model for warranty claim records
+    columns:
+      - name: warranty_claim_id
+        description: Primary key for warranty claim
+        data_tests:
+          - unique
+          - not_null
+      - name: vin
+        description: Vehicle Identification Number
+        data_tests:
+          - not_null
+      - name: customer_id
+        description: Foreign key to customer
+        data_tests:
+          - not_null
+      - name: dealer_id
+        description: Foreign key to dealer where claim was filed
+        data_tests:
+          - not_null
+      - name: claim_status
+        description: Current status of the warranty claim
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['OPEN', 'IN_REVIEW', 'CLOSED', 'DENIED']
+      - name: cost_amount
+        description: Cost amount of the warranty claim

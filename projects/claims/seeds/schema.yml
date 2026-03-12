@@ -1,0 +1,444 @@
+version: 2
+
+seeds:
+  - name: fact_claims
+    description: >
+      Core warranty claim transactions for heavy truck fleet operations.
+      Each row represents a single warranty claim filed by a dealer technician.
+    columns:
+      - name: claim_id
+        description: Unique warranty claim identifier (WC-XXXXXXXXXX format)
+        tests:
+          - unique
+          - not_null
+      - name: dealer_id
+        description: Dealer location identifier (DLR-XXX format)
+        tests:
+          - not_null
+      - name: vin
+        description: Vehicle Identification Number
+        tests:
+          - not_null
+      - name: fleet_id
+        description: Fleet group assignment identifier (FLT-XXXX format)
+      - name: technician_id
+        description: Dealer technician who filed the claim (DLR-XXX-TECH-XX format)
+        tests:
+          - not_null
+      - name: filed_date
+        description: Date the claim was submitted
+        tests:
+          - not_null
+      - name: repair_date
+        description: Date the repair was completed
+        tests:
+          - not_null
+      - name: claim_year
+        description: Calendar year extracted from the claim date
+      - name: claim_month
+        description: Calendar month extracted from the claim date
+      - name: claim_quarter
+        description: Fiscal quarter (Q1-Q4)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Q1', 'Q2', 'Q3', 'Q4']
+      - name: mileage_at_repair
+        description: Vehicle odometer reading at time of repair
+      - name: vehicle_model
+        description: Vehicle make and model name
+      - name: model_year
+        description: Vehicle model year
+      - name: claim_type
+        description: Category of warranty claim
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Base Warranty', 'Extended Warranty', 'Emissions Warranty', 'Goodwill', 'Campaign/Recall', 'Policy Adjustment']
+      - name: symptom_reported
+        description: Free-text description of the reported vehicle symptom
+      - name: total_parts_cost
+        description: Total cost of replacement parts in USD
+      - name: total_labor_hours
+        description: Total labor hours charged for the repair
+      - name: total_labor_cost
+        description: Total labor cost in USD
+      - name: total_claim_amount
+        description: Total claim value (parts + labor) in USD
+      - name: num_line_items
+        description: Number of individual repair line items on this claim
+      - name: technician_narrative
+        description: Free-form technician notes describing work performed
+      - name: status
+        description: Current claim processing status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Submitted', 'Approved', 'Rejected', 'Escalated', 'Under Review']
+      - name: risk_score
+        description: Automated fraud/anomaly risk score (0-100)
+      - name: is_anomaly
+        description: Whether the claim was flagged as a statistical anomaly (Y/N)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Y', 'N']
+      - name: anomaly_tier
+        description: Anomaly severity tier classification (empty if not anomalous)
+      - name: anomaly_flags
+        description: Descriptive anomaly flag text (empty if not anomalous)
+      - name: days_to_warranty_end
+        description: Days remaining until warranty expiration (negative = expired)
+      - name: prior_claims_on_vin
+        description: Count of historical claims for this VIN
+      - name: campaign_id
+        description: Campaign/recall identifier if applicable (CAMP-XXXX format, often empty)
+      - name: pre_authorized
+        description: Whether the claim was pre-authorized (Y/N)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Y', 'N']
+      - name: submission_channel
+        description: Method used to submit the claim
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['PRISM Batch Upload', 'PRISM Manual Entry', 'Mobile App', 'API']
+
+  - name: fact_claim_lines
+    description: >
+      Individual line items within each warranty claim. Each line represents
+      a specific part replacement or repair operation.
+    columns:
+      - name: claim_line_id
+        description: Unique claim line identifier (CL-XXXXXX format)
+        tests:
+          - unique
+          - not_null
+      - name: claim_id
+        description: Parent claim identifier
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fact_claims')
+                field: claim_id
+      - name: line_number
+        description: Sequential line number within the claim
+      - name: part_number
+        description: Internal part catalog number
+        tests:
+          - not_null
+      - name: vmrs_component_code
+        description: VMRS (Vehicle Maintenance Reporting Standards) component code
+        tests:
+          - not_null
+      - name: vmrs_cause_code
+        description: VMRS failure cause classification code
+      - name: vmrs_correction_code
+        description: VMRS correction method classification code
+      - name: quantity
+        description: Number of parts used
+      - name: unit_cost
+        description: Cost per unit of the part in USD
+      - name: line_total
+        description: Total cost for this line item in USD
+      - name: labor_hours
+        description: Actual labor hours for this repair operation
+      - name: srt_standard_hours
+        description: Standard Repair Time expected hours
+      - name: labor_variance_pct
+        description: Percentage variance between actual and standard labor hours
+      - name: cost_variance_pct
+        description: Percentage variance between actual and expected parts cost
+      - name: repair_type
+        description: Complexity classification of the repair
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Standard', 'Complex']
+
+  - name: fact_claim_attachments
+    description: >
+      Document and photo evidence uploaded for warranty claims.
+      Includes duplicate detection metadata via perceptual hashing.
+    columns:
+      - name: attachment_id
+        description: Unique attachment identifier (ATT-XXXXXX format)
+        tests:
+          - unique
+          - not_null
+      - name: claim_id
+        description: Parent claim identifier
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fact_claims')
+                field: claim_id
+      - name: file_name
+        description: Original uploaded file name
+      - name: file_type
+        description: File format type
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['JPEG', 'PDF']
+      - name: file_size_kb
+        description: File size in kilobytes
+      - name: upload_date
+        description: Date the file was uploaded
+      - name: perceptual_hash
+        description: Perceptual hash for image similarity detection (64-char hex)
+      - name: ssim_match_score
+        description: Structural Similarity Index score for duplicate detection (0-1)
+      - name: is_duplicate_flag
+        description: Whether this file was flagged as a duplicate (Y/N)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Y', 'N']
+
+  - name: fact_claim_audit_log
+    description: >
+      Complete workflow and status transition history for each claim.
+      Tracks every action from submission through resolution.
+    columns:
+      - name: audit_id
+        description: Unique audit event identifier (AUD-XXXXXX format)
+        tests:
+          - unique
+          - not_null
+      - name: claim_id
+        description: Parent claim identifier
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fact_claims')
+                field: claim_id
+      - name: action
+        description: Workflow action performed
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Submitted', 'Routed', 'Approved', 'Rejected']
+      - name: action_date
+        description: Timestamp of the action
+        tests:
+          - not_null
+      - name: performed_by
+        description: Actor who performed the action (technician ID, REVIEWER-XX, or SYSTEM)
+      - name: role
+        description: Role of the actor
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Dealer Technician', 'Claim Processor', 'Automated']
+      - name: previous_status
+        description: Claim status before this action (empty for initial submission)
+      - name: new_status
+        description: Claim status after this action
+      - name: notes
+        description: Free-form notes about the action
+      - name: routing_rule
+        description: Automated routing rule applied (if any)
+
+  - name: fact_cluster_assignments
+    description: >
+      ML clustering results assigning each claim to a behavioral pattern cluster.
+      Used for anomaly detection and claim pattern analysis.
+    columns:
+      - name: claim_id
+        description: Claim identifier (1:1 with fact_claims)
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fact_claims')
+                field: claim_id
+      - name: cluster_id
+        description: Descriptive cluster name (e.g., Electrical-Intermittent-Faults)
+        tests:
+          - not_null
+      - name: cluster_size
+        description: Total number of claims in this cluster
+      - name: distance_from_centroid
+        description: Statistical distance of this claim from its cluster center
+      - name: is_outlier
+        description: Whether this claim is a statistical outlier within its cluster (Y/N)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Y', 'N']
+      - name: cluster_avg_claim_amount
+        description: Average claim amount within this cluster in USD
+      - name: cluster_std_claim_amount
+        description: Standard deviation of claim amounts within this cluster
+      - name: claim_amount_z_score
+        description: Z-score of this claim's amount relative to its cluster
+
+  - name: dim_vehicles
+    description: >
+      Vehicle master data dimension table. Contains vehicle specifications,
+      warranty coverage, and lifecycle information.
+    columns:
+      - name: vin
+        description: Vehicle Identification Number (primary key)
+        tests:
+          - unique
+          - not_null
+      - name: dealer_id
+        description: Dealer location where vehicle is registered
+      - name: fleet_id
+        description: Fleet group assignment
+      - name: model_name
+        description: Vehicle make and model name
+      - name: vehicle_class
+        description: FHWA vehicle weight classification
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Class 6', 'Class 7', 'Class 8']
+      - name: model_year
+        description: Vehicle model year
+      - name: engine_type
+        description: Engine make and model
+      - name: transmission
+        description: Transmission type
+      - name: warranty_type
+        description: Active warranty coverage type
+      - name: warranty_start_date
+        description: Warranty coverage start date
+      - name: warranty_end_date
+        description: Warranty coverage expiration date
+      - name: current_mileage
+        description: Last known odometer reading in miles
+      - name: lifecycle_stage
+        description: Current vehicle lifecycle classification
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['New', 'Mid-Life', 'End-of-Warranty']
+      - name: production_plant
+        description: Manufacturing plant location
+      - name: build_date
+        description: Vehicle manufacturing date
+      - name: production_batch
+        description: Production batch identifier (PLANT-YYYYMM-NN format)
+
+  - name: ref_dealer_baselines
+    description: >
+      Dealer performance benchmarks by repair category and year.
+      Includes peer group comparisons and tier classifications.
+    columns:
+      - name: dealer_id
+        description: Dealer location identifier
+        tests:
+          - not_null
+      - name: year
+        description: Performance benchmark year
+        tests:
+          - not_null
+      - name: category
+        description: VMRS repair category name
+        tests:
+          - not_null
+      - name: claim_count
+        description: Number of claims in this category for the year
+      - name: avg_labor_hours
+        description: Dealer average labor hours per claim
+      - name: avg_parts_cost
+        description: Dealer average parts cost per claim in USD
+      - name: peer_avg_labor_hours
+        description: Peer group average labor hours for benchmarking
+      - name: peer_avg_parts_cost
+        description: Peer group average parts cost in USD
+      - name: labor_vs_peer_pct
+        description: Labor hours variance vs peer average (percentage)
+      - name: cost_vs_peer_pct
+        description: Parts cost variance vs peer average (percentage)
+      - name: rejection_rate_pct
+        description: Percentage of claims rejected in this category
+      - name: tier
+        description: Dealer performance tier classification
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Platinum', 'Gold', 'Silver']
+
+  - name: ref_srt
+    description: >
+      Standard Repair Times reference table. Defines expected labor hours
+      by component, cause, and repair complexity for variance analysis.
+    columns:
+      - name: srt_id
+        description: Unique SRT record identifier (SRT-XXXX format)
+        tests:
+          - unique
+          - not_null
+      - name: vmrs_component_code
+        description: VMRS component code this standard applies to
+        tests:
+          - not_null
+      - name: vmrs_cause_code
+        description: VMRS cause code this standard applies to
+      - name: repair_type
+        description: Repair complexity classification
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Standard', 'Complex']
+      - name: standard_labor_hours
+        description: Expected labor hours for this repair operation
+      - name: labor_hour_tolerance_pct
+        description: Acceptable variance percentage from standard hours
+      - name: applicable_models
+        description: Comma-separated list of applicable vehicle models or 'All'
+      - name: effective_date
+        description: Date this standard became effective
+      - name: last_updated
+        description: Date of most recent update to this standard
+
+  - name: ref_pfp
+    description: >
+      Part Failure Patterns reference table. Tracks expected vs actual
+      failure rates by part, model, and year for predictive maintenance.
+    columns:
+      - name: pfp_id
+        description: Unique part failure pattern identifier (PFP-XXXXX format)
+        tests:
+          - unique
+          - not_null
+      - name: part_number
+        description: Part catalog number
+        tests:
+          - not_null
+      - name: part_description
+        description: Human-readable part name
+      - name: model_name
+        description: Vehicle model this pattern applies to
+      - name: model_year
+        description: Vehicle model year
+      - name: vehicles_in_population
+        description: Total vehicles in the installed base for this model/year
+      - name: expected_failure_rate_per_1000
+        description: Expected failures per 1,000 vehicles
+      - name: actual_failure_count
+        description: Observed failure count
+      - name: actual_failure_rate_per_1000
+        description: Observed failure rate per 1,000 vehicles
+      - name: deviation_pct
+        description: Percentage deviation from expected failure rate
+      - name: trend
+        description: Failure rate trend direction
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Stable', 'Increasing', 'Decreasing', 'Spike']
+      - name: period
+        description: Fiscal year period (YYYY-FY format)
+      - name: last_updated
+        description: Date of most recent data update

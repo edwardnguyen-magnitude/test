@@ -1,0 +1,36 @@
+medallion:
+  target: "{{ env_var('DBT_TARGET', 'dev') }}"
+
+  outputs:
+    # Development environment (local or Docker)
+    dev:
+      type: postgres
+      host: "{{ env_var('DBT_HOST', 'localhost') }}"
+      port: "{{ env_var('DBT_PORT', '5432') | int }}"
+      user: "{{ env_var('DBT_USER', 'postgres') }}"
+      password: "{{ env_var('DBT_PASSWORD', 'postgres') }}"
+      dbname: "{{ env_var('DBT_DB', 'fabrion') }}"
+      schema: dev
+      threads: 4
+
+    # Docker environment
+    docker:
+      type: postgres
+      host: postgres
+      port: 5432
+      user: "{{ env_var('DBT_USER', 'postgres') }}"
+      password: "{{ env_var('DBT_PASSWORD', 'postgres') }}"
+      dbname: "{{ env_var('DBT_DB', 'fabrion') }}"
+      schema: dev
+      threads: 4
+
+    # Production environment
+    prod:
+      type: postgres
+      host: "{{ env_var('DBT_HOST') }}"
+      port: "{{ env_var('DBT_PORT', '5432') | int }}"
+      user: "{{ env_var('DBT_USER') }}"
+      password: "{{ env_var('DBT_PASSWORD') }}"
+      dbname: "{{ env_var('DBT_DB') }}"
+      schema: analytics
+      threads: 8

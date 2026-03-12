@@ -1,0 +1,18 @@
+views:
+  - name: claims_overview
+    description: Executive warranty claims dashboard view
+    cubes:
+      - join_path: claim_summary
+        includes:
+          - claim_id
+          - dealer_id
+          - vin
+          - vehicle_model
+          - claim_type
+          - status
+          - total_claim_amount
+          - risk_score
+          - cluster_id
+          - warranty_active_at_filing
+          - mileage_bucket
+          - count

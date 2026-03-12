@@ -1,0 +1,230 @@
+version: 2
+
+models:
+  - name: int_product_compliance_checks
+    description: >
+      Product-level compliance check results against each regulatory list.
+      Each row represents one product-substance-regulation combination,
+      indicating whether the substance concentration exceeds the regulatory threshold.
+      Core building block for product compliance and substance risk marts.
+    config:
+      tags: ["Silver", "substance-screening", "regulatory-compliance"]
+    meta:
+      domain: "Regulatory Compliance"
+      data_owner: "ESI Product Stewardship"
+      contains_pii: false
+      grain: "One row per product-substance-regulation combination"
+    columns:
+      - name: product_id
+        description: Unique product identifier from the products seed
+        tags: ["identifier"]
+      - name: product_description
+        description: Human-readable product name
+      - name: business_unit
+        description: ESI business unit that manufactures this product
+      - name: product_category
+        description: Product classification category
+      - name: product_substance_id
+        description: Unique product-substance link identifier
+        tags: ["identifier"]
+      - name: actual_concentration_ppm
+        description: Measured concentration of the substance in the product (parts per million)
+        tags: ["chemical-data", "metric"]
+      - name: last_verified_date
+        description: Date the concentration measurement was last verified
+      - name: data_source
+        description: Source of the substance data (Sphera Cloud, SDS Review, Lab Analysis, etc.)
+      - name: substance_id
+        description: Unique restricted substance identifier
+        tags: ["identifier"]
+      - name: substance_name
+        description: Common chemical name of the restricted substance
+        tags: ["chemical-data"]
+      - name: cas_number
+        description: Chemical Abstracts Service registry number for the substance
+        tags: ["chemical-data"]
+      - name: hazard_class
+        description: Hazard classification of the substance (CMR, PBT, vPvB, ED, Toxic)
+      - name: restriction_type
+        description: Type of regulatory restriction (banned, restricted, declarable, candidate)
+      - name: threshold_ppm
+        description: Maximum allowed concentration per the regulatory list (parts per million)
+        tags: ["chemical-data", "metric"]
+      - name: list_id
+        description: Unique regulatory list identifier
+        tags: ["identifier"]
+      - name: list_code
+        description: Short code for the regulatory list (SVHC, RoHS, TSCA_PBT, etc.)
+      - name: list_name
+        description: Full official name of the regulatory list
+      - name: regulation_region
+        description: Geographic jurisdiction of the regulation (EU, US, KR, Global, etc.)
+      - name: exceeds_threshold
+        description: >
+          Boolean flag indicating whether the actual concentration exceeds the regulatory threshold.
+          True means the product is non-compliant for this substance under this regulation.
+        tags: ["metric"]
+
+  - name: int_survey_turnaround
+    description: >
+      Enriched survey request data with turnaround time calculations,
+      customer details, and response aggregations. Used to calculate
+      SLA compliance and regional performance metrics.
+    config:
+      tags: ["Silver", "survey-management"]
+    meta:
+      domain: "Regulatory Compliance"
+      data_owner: "ESI Survey Operations"
+      contains_pii: false
+      grain: "One row per survey request"
+    columns:
+      - name: survey_id
+        description: Unique survey request identifier
+        tags: ["identifier"]
+        tests: [unique, not_null]
+      - name: customer_id
+        description: Foreign key to the requesting customer
+        tags: ["identifier"]
+      - name: customer_name
+        description: Name of the requesting customer organization
+      - name: customer_region
+        description: Geographic region of the customer (from customer master data)
+      - name: industry
+        description: Primary industry classification of the customer
+      - name: region
+        description: Region the survey pertains to (may differ from customer region)
+      - name: survey_type
+        description: Regulatory framework being assessed (SVHC, RoHS, TSCA_PBT, etc.)
+      - name: complexity
+        description: Survey complexity level (easy, mid-complex, complex)
+      - name: product_count
+        description: Number of products included in this survey
+        tags: ["metric"]
+      - name: status
+        description: Current status of the survey (completed, in_progress, pending, cancelled)
+      - name: requested_date
+        description: Date the survey was requested
+      - name: due_date
+        description: Contractual due date for survey completion
+      - name: completed_date
+        description: Actual completion date (null if not yet completed)
+      - name: business_unit
+        description: ESI business unit handling the survey
+      - name: actual_days
+        description: >
+          Number of calendar days between request date and completion date.
+          Null for uncompleted surveys.
+        tags: ["metric"]
+      - name: allowed_days
+        description: Number of calendar days between request date and due date (the SLA window)
+        tags: ["metric"]
+      - name: timeliness_status
+        description: >
+          Derived timeliness classification: 'on_time' (completed by due date),
+          'late' (completed after due date), 'overdue' (not completed and past due),
+          'in_progress' (not completed and not yet past due)
+        tests:
+          - accepted_values:
+              values: ['on_time', 'late', 'overdue', 'in_progress']
+      - name: total_responses
+        description: Total number of product-substance responses submitted for this survey
+        tags: ["metric"]
+      - name: compliant_count
+        description: Number of responses with 'compliant' status
+        tags: ["metric"]
+      - name: non_compliant_count
+        description: Number of responses with 'non_compliant' status
+        tags: ["metric"]
+      - name: flagged_count
+        description: Number of responses with 'flagged' status requiring further review
+        tags: ["metric"]
+      - name: under_review_count
+        description: Number of responses currently under review
+        tags: ["metric"]
+
+  - name: int_substance_coverage_by_product
+    description: >
+      Coverage analysis showing how thoroughly each product has been screened
+      against each regulatory list. Uses a cross join of products and regulatory lists
+      to identify screening gaps.
+    config:
+      tags: ["Silver", "substance-screening", "regulatory-compliance"]
+    meta:
+      domain: "Regulatory Compliance"
+      data_owner: "ESI Product Stewardship"
+      contains_pii: false
+      grain: "One row per product-regulatory list combination"
+    columns:
+      - name: product_id
+        description: Unique product identifier
+        tags: ["identifier"]
+      - name: product_description
+        description: Human-readable product name
+      - name: business_unit
+        description: ESI business unit that manufactures this product
+      - name: product_category
+        description: Product classification category
+      - name: list_id
+        description: Unique regulatory list identifier
+        tags: ["identifier"]
+      - name: list_code
+        description: Short code for the regulatory list
+      - name: list_name
+        description: Full official name of the regulatory list
+      - name: regulation_region
+        description: Geographic jurisdiction of the regulation
+      - name: substances_screened
+        description: Number of substances on this list that have been tested in this product
+        tags: ["metric"]
+      - name: total_substances_on_list
+        description: Total number of substances on this regulatory list
+        tags: ["metric"]
+      - name: screening_coverage_pct
+        description: >
+          Percentage of the regulatory list's substances that have been screened
+          in this product (substances_screened / total_substances_on_list * 100)
+        tags: ["metric"]
+
+  - name: int_regional_survey_volume
+    description: >
+      Monthly aggregated survey volumes by region, business unit, complexity,
+      and survey type. Provides operational visibility into survey workload distribution.
+    config:
+      tags: ["Silver", "survey-management"]
+    meta:
+      domain: "Regulatory Compliance"
+      data_owner: "ESI Survey Operations"
+      contains_pii: false
+      grain: "One row per region-business_unit-complexity-survey_type-month combination"
+    columns:
+      - name: region
+        description: Geographic region of the survey (EMEA, AMERICAS, ASIA)
+      - name: business_unit
+        description: ESI business unit handling the surveys
+      - name: complexity
+        description: Survey complexity level (easy, mid-complex, complex)
+      - name: survey_type
+        description: Regulatory framework being assessed
+      - name: request_month
+        description: Month the surveys were requested, truncated to first day of month
+      - name: survey_count
+        description: Total number of surveys requested in this grouping
+        tags: ["metric"]
+      - name: total_products_queried
+        description: Sum of all product counts across surveys in this grouping
+        tags: ["metric"]
+      - name: completed_count
+        description: Number of surveys with 'completed' status
+        tags: ["metric"]
+      - name: in_progress_count
+        description: Number of surveys currently in progress
+        tags: ["metric"]
+      - name: pending_count
+        description: Number of surveys still pending
+        tags: ["metric"]
+      - name: cancelled_count
+        description: Number of cancelled surveys
+        tags: ["metric"]
+      - name: avg_products_per_survey
+        description: Average number of products per survey in this grouping
+        tags: ["metric"]

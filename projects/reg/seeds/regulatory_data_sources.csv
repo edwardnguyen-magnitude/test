@@ -1,0 +1,31 @@
+source_id,source_name,source_type,region,url,update_frequency,last_checked
+SRC-01,ECHA,government,EU,https://echa.europa.eu,daily,2026-02-15
+SRC-02,EUR-Lex,government,EU,https://eur-lex.europa.eu,weekly,2026-02-10
+SRC-03,EPA,government,US,https://www.epa.gov,daily,2026-02-16
+SRC-04,OEHHA,government,US,https://oehha.ca.gov,monthly,2026-01-31
+SRC-05,ChemLinked,commercial,GLOBAL,https://www.chemlinked.com,daily,2026-02-15
+SRC-06,Chemical Watch,news,GLOBAL,https://chemicalwatch.com,daily,2026-02-16
+SRC-07,Enhesa,consultant,GLOBAL,https://www.enhesa.com,weekly,2026-02-12
+SRC-08,REACHLaw,consultant,EU,https://www.reachlaw.fi,monthly,2026-01-20
+SRC-09,CIRS ChemRadar,commercial,GLOBAL,https://www.cirs-group.com,weekly,2026-02-09
+SRC-10,NITE-CHRIP,government,JP,https://www.nite.go.jp/en/chem/chrip,monthly,2026-01-15
+SRC-11,REACH24H,consultant,GLOBAL,https://www.reach24h.com,weekly,2026-02-08
+SRC-12,Enviliance,commercial,GLOBAL,https://enviliance.com,daily,2026-02-16
+SRC-13,GPC Gateway,commercial,GLOBAL,https://www.gpcgateway.com,weekly,2026-02-07
+SRC-14,Sphera Cloud,internal,GLOBAL,https://sphera.cloud.internal,daily,2026-02-16
+SRC-15,Chemmate,internal,GLOBAL,https://chemmate.internal,daily,2026-02-16
+SRC-16,Palantir Foundry,internal,GLOBAL,https://foundry.internal,real-time,2026-02-16
+SRC-17,SciFinder,commercial,GLOBAL,https://scifinder.cas.org,daily,2026-02-15
+SRC-18,Korea MEE,government,KR,https://www.me.go.kr,monthly,2026-01-28
+SRC-19,Environment Canada,government,CA,https://www.canada.ca/en/environment-climate-change,monthly,2026-01-30
+SRC-20,Taiwan MoE,government,TW,https://www.moenv.gov.tw,quarterly,2025-12-15
+SRC-21,China MEE,government,CN,https://www.mee.gov.cn,monthly,2026-01-25
+SRC-22,China MEM,government,CN,https://www.mem.gov.cn,monthly,2026-01-20
+SRC-23,ChemGes,commercial,GLOBAL,https://www.dr-software.com/chemges,weekly,2026-02-11
+SRC-24,IAEG,consultant,GLOBAL,https://www.iaeg.com,quarterly,2025-11-30
+SRC-25,GASG,consultant,GLOBAL,https://www.gadsl.org,semi-annual,2025-10-15
+SRC-26,WHO IARC,government,GLOBAL,https://monographs.iarc.who.int,annual,2025-06-01
+SRC-27,Toxnet (NLM),government,US,https://www.nlm.nih.gov/toxnet,monthly,2026-01-18
+SRC-28,OECD eChemPortal,government,GLOBAL,https://www.echemportal.org,weekly,2026-02-06
+SRC-29,PubChem,government,US,https://pubchem.ncbi.nlm.nih.gov,daily,2026-02-15
+SRC-30,CompTox Dashboard,government,US,https://comptox.epa.gov/dashboard,monthly,2026-01-22

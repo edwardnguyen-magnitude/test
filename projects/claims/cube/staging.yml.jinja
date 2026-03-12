@@ -1,0 +1,47 @@
+{% set claims = dbt_model('stg_claims') %}
+{% set vehicles = dbt_model('stg_vehicles') %}
+{% set claim_lines = dbt_model('stg_claim_lines') %}
+
+cubes:
+  - name: claims
+    sql_table: {{ claims.sql_table }}
+    description: {{ claims.description }}
+    dimensions: {{ claims.as_dimensions() }}
+    measures:
+      - name: count
+        type: count
+      - name: total_amount
+        sql: total_claim_amount
+        type: sum
+      - name: avg_amount
+        sql: total_claim_amount
+        type: avg
+      - name: avg_risk_score
+        sql: risk_score
+        type: avg
+
+  - name: vehicles
+    sql_table: {{ vehicles.sql_table }}
+    description: {{ vehicles.description }}
+    dimensions: {{ vehicles.as_dimensions() }}
+    measures:
+      - name: count
+        type: count
+
+  - name: claim_lines
+    sql_table: {{ claim_lines.sql_table }}
+    description: {{ claim_lines.description }}
+    joins:
+      - name: claims
+        sql: "{CUBE.claim_id} = {claims.claim_id}"
+        relationship: many_to_one
+    dimensions: {{ claim_lines.as_dimensions() }}
+    measures:
+      - name: count
+        type: count
+      - name: total_line_cost
+        sql: line_total
+        type: sum
+      - name: avg_labor_hours
+        sql: labor_hours
+        type: avg

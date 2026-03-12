@@ -1,0 +1,61 @@
+product_id,product_code,product_description,business_unit,product_category,cas_registry
+PROD-001,SAC305-FLUX,SAC305 Lead-Free Solder Paste,Alpha,Soldering Materials,
+PROD-002,SAC387-PASTE,SAC387 No-Clean Solder Paste,Alpha,Soldering Materials,
+PROD-003,OM338-PT,OM338-PT Solder Paste Type 4,Alpha,Soldering Materials,
+PROD-004,CVP520-FLUX,CVP-520 VOC-Free Flux,Alpha,Flux,
+PROD-005,EF6000-WIRE,Telecore HF-850 Cored Wire,Alpha,Soldering Materials,
+PROD-006,ALPHA-LF300,LF-300 Lead-Free Solder Bar,Alpha,Soldering Materials,
+PROD-007,SAC-PREFORM1,SAC305 Solder Preforms,Alpha,Soldering Materials,
+PROD-008,NR205-FLUX,NR205 No-Residue Flux,Alpha,Flux,
+PROD-009,ALPHA-HMP,High Melting Point Solder Paste,Alpha,Soldering Materials,
+PROD-010,ALPHA-TACKY,Tacky Flux TF-10,Alpha,Flux,
+PROD-011,ENT-CUVIA,Cuprotec HS Acid Copper,Enthone,Electroplating Solutions,
+PROD-012,ENT-NIKLAD,Niklad ELV Electroless Nickel,Enthone,Electroplating Solutions,7440-02-0
+PROD-013,ENT-AUREL,Aurelect PC Gold Plating,Enthone,Surface Finishes,7440-57-5
+PROD-014,ENT-ENIG,ENIG Surface Finish Solution,Enthone,Surface Finishes,
+PROD-015,ENT-IMMSN,Immersion Tin Process,Enthone,Surface Finishes,7440-31-5
+PROD-016,ENT-PALLAD,Pallatec Palladium Strike,Enthone,Electroplating Solutions,7440-05-3
+PROD-017,ENT-ZINCAT,Zincat HT Zinc Plating,Enthone,Electroplating Solutions,7440-66-6
+PROD-018,ENT-CHRM3,Trivalent Chromium Process,Enthone,Surface Finishes,
+PROD-019,ENT-SNTRI,SnTri Matte Tin Plating,Enthone,Electroplating Solutions,7440-31-5
+PROD-020,ENT-AGBRT,Silver Bright Plating Bath,Enthone,Electroplating Solutions,7440-22-4
+PROD-021,COV-TRIZINC,TriZinc 300 Alkaline Zinc,Coventya,Electroplating Solutions,
+PROD-022,COV-NIKEL,NiKel HE High-Efficiency Nickel,Coventya,Electroplating Solutions,7440-02-0
+PROD-023,COV-CHROM,Chromitop TCP Passivate,Coventya,Surface Finishes,
+PROD-024,COV-CUPREX,Cuprex Acid Copper Brightener,Coventya,Electroplating Solutions,7440-50-8
+PROD-025,COV-ZNNI,ZnNi Alloy Plating Bath,Coventya,Electroplating Solutions,
+PROD-026,COV-SEAL,Corrosion Seal Post-Treatment,Coventya,Coatings,
+PROD-027,COV-DEGAS,Degreaser Ultra Alkaline,Coventya,Cleaning Agents,
+PROD-028,COV-STRIP,Strip-It Copper Stripper,Coventya,Cleaning Agents,
+PROD-029,ELB-APL,APL Acrylic Conformal Coating,Electrolube,Conformal Coatings,
+PROD-030,ELB-UR,UR Polyurethane Conformal Coating,Electrolube,Conformal Coatings,
+PROD-031,ELB-SCC3,SCC3 Silicone Conformal Coating,Electrolube,Conformal Coatings,
+PROD-032,ELB-EA091,Epoxy Adhesive EA091,Electrolube,Adhesives,
+PROD-033,ELB-TCC,Thermal Conductive Compound,Electrolube,Adhesives,
+PROD-034,ELB-ULC,Ultraclean PCB Cleaner,Electrolube,Cleaning Agents,
+PROD-035,ELB-SWA,Safewash Anti-Static Cleaner,Electrolube,Cleaning Agents,
+PROD-036,ELB-ERSC,Contact Treatment Grease,Electrolube,Coatings,
+PROD-037,KST-256,Kester 256 No-Clean Flux,Kester,Flux,
+PROD-038,KST-245,Kester 245 No-Clean Flux,Kester,Flux,
+PROD-039,KST-NXG1,NXG1 Lead-Free Solder Paste,Kester,Soldering Materials,
+PROD-040,KST-275,Kester 275 Spirit Flux,Kester,Flux,
+PROD-041,KST-WIRE44,Solder Wire 44 Activated Rosin,Kester,Soldering Materials,
+PROD-042,KST-R562,R562 Water-Soluble Paste,Kester,Soldering Materials,
+PROD-043,KST-ULTRA,Ultrapure Solder Bar,Kester,Soldering Materials,
+PROD-044,KST-951,951 Soldering Flux Pen,Kester,Flux,
+PROD-045,MCD-ENDURA,Endura 350 Surface Treatment,MacDermid,Surface Finishes,
+PROD-046,MCD-OSP,Organic Solderability Preservative,MacDermid,Surface Finishes,
+PROD-047,MCD-ETCHCU,Micro-Etch Copper Treatment,MacDermid,Cleaning Agents,
+PROD-048,MCD-NIPH,Electroless Nickel-Phosphorus,MacDermid,Electroplating Solutions,7440-02-0
+PROD-049,MCD-SHADOW,Shadow Direct Metallization,MacDermid,Electroplating Solutions,
+PROD-050,MCD-M1,M-Plate Immersion Silver,MacDermid,Surface Finishes,7440-22-4
+PROD-051,MCD-BONDER,MetaBond Adhesion Promoter,MacDermid,Adhesives,
+PROD-052,MCD-RESIST,Ultra Resist Photoresist,MacDermid,Coatings,
+PROD-053,ALPHA-CLEAN1,Residue Cleaner RC-100,Alpha,Cleaning Agents,
+PROD-054,ENT-BARREL,Barrel Copper Plating Solution,Enthone,Electroplating Solutions,
+PROD-055,COV-PASSIV,Passivation Solution Blue,Coventya,Surface Finishes,
+PROD-056,ELB-TPR,Two-Part Resin Encapsulant,Electrolube,Adhesives,
+PROD-057,KST-RFWAVE,RF Wave Solder Paste,Kester,Soldering Materials,
+PROD-058,MCD-BLACKOX,Black Oxide Treatment,MacDermid,Surface Finishes,
+PROD-059,ALPHA-STNCL,Stencil Adhesive SA-200,Alpha,Adhesives,
+PROD-060,ENT-RHODEX,Rhodium Plating Solution,Enthone,Electroplating Solutions,7440-16-6

@@ -1,0 +1,41 @@
+packages:
+  # ============================================
+  # Essential Packages
+  # ============================================
+
+  # dbt-utils: Swiss army knife of utilities
+  # Use cases: surrogate keys, pivot/unpivot, date spine, safe_add
+  - package: dbt-labs/dbt_utils
+    version: 1.3.0
+
+  # dbt-expectations: Data quality testing (inspired by Great Expectations)
+  # Use cases: column value checks, distribution tests, regex validation
+  - package: calogica/dbt_expectations
+    version: 0.10.4
+
+  # ============================================
+  # Development & Productivity Packages
+  # ============================================
+
+  # dbt-codegen: Auto-generate model/source YAML
+  # Use cases: scaffold staging models, generate source.yml from database
+  - package: dbt-labs/codegen
+    version: 0.13.1
+
+  # ============================================
+  # Date Utilities
+  # ============================================
+
+  # dbt-date: Date/time utilities
+  # Use cases: fiscal calendars, date dimensions, time zone handling
+  - package: calogica/dbt_date
+    version: 0.10.1
+
+  # ============================================
+  # Database Constraints
+  # ============================================
+
+  # dbt-constraints: Auto-generate database constraints from tests
+  # Use cases: PK/FK/unique constraints, ERD generation in pgAdmin
+  - package: Snowflake-Labs/dbt_constraints
+    version: 1.0.6

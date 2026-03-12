@@ -1,0 +1,66 @@
+name: 'medallion_supply_chain'
+version: '1.0.0'
+config-version: 2
+
+profile: 'medallion'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# ============================================
+# Simplified Domain-Based Configuration
+# ============================================
+# Schema = domain (supply_chain, fab_trucking)
+# Layer = naming convention (stg_*, int_*, dim_*, fact_*, rpt_*)
+# ============================================
+
+models:
+    fab_trucking:
+      +schema: fab_trucking
+      +tags: ['fab_trucking', 'Tier1']  # Critical trucking domain
+      +meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+      staging:
+        +tags: ['Bronze']
+      intermediate:
+        +tags: ['Silver']
+      marts:
+        +tags: ['Gold']
+
+# ============================================
+# Seed Configuration by Domain
+# ============================================
+seeds:
+    fab_trucking:
+      +schema: fab_trucking
+      +tags: ['Seeds', 'fab_trucking']
+
+# ============================================
+# Test Configuration - Quality tier between Bronze and Silver
+# ============================================
+tests:
+    fab_trucking:
+      +tags: ['Quality', 'fab_trucking']
+
+# Variables
+vars:
+  start_date: '2024-01-01'
+  dbt_constraints_enabled: true
+  dbt_constraints_sources_enabled: true
+
+flags:
+  require_generic_test_arguments_property: true
+  indirect_selection: cautious
+
+# Auto-refresh PostgREST API views after dbt runs (gracefully skips if not available)
+on-run-end:
+  - "{% if execute %}{% do run_query('DO $$ BEGIN PERFORM api.refresh_gold_views(); EXCEPTION WHEN OTHERS THEN RAISE NOTICE \\'api.refresh_gold_views() not available, skipping\\'; END $$') %}{% endif %}"

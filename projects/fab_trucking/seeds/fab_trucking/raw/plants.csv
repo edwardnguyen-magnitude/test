@@ -1,0 +1,9 @@
+plant_id,tenant_id,plant_code,plant_name,location_country,location_region,time_zone,capacity_trucks_per_day,manager_employee_id,plant_type,status,created_at,updated_at
+PLT001,fab_trucking,FT-DET-01,Detroit Assembly Plant,US,NORTH_AMERICA,America/Detroit,45,EMP001,ASSEMBLY,ACTIVE,2020-01-15,2024-01-01
+PLT002,fab_trucking,FT-DET-02,Detroit Paint Facility,US,NORTH_AMERICA,America/Detroit,60,EMP002,PAINT,ACTIVE,2020-01-15,2024-01-01
+PLT003,fab_trucking,FT-CHI-01,Chicago Test Center,US,NORTH_AMERICA,America/Chicago,30,EMP003,TESTING,ACTIVE,2021-03-20,2024-01-01
+PLT004,fab_trucking,FT-DAL-01,Dallas Assembly Plant,US,SOUTH,America/Chicago,50,EMP004,ASSEMBLY,ACTIVE,2019-06-01,2024-01-01
+PLT005,fab_trucking,FT-MEX-01,Monterrey Plant,MX,LATAM,America/Monterrey,40,EMP005,ASSEMBLY,ACTIVE,2022-01-10,2024-01-01
+PLT006,fab_trucking,FT-CAN-01,Toronto Assembly,CA,NORTH_AMERICA,America/Toronto,35,EMP006,ASSEMBLY,ACTIVE,2021-08-15,2024-01-01
+PLT007,fab_trucking,FT-DET-03,Detroit Dyno Center,US,NORTH_AMERICA,America/Detroit,25,EMP007,TESTING,ACTIVE,2020-05-01,2024-01-01
+PLT008,fab_trucking,FT-PHX-01,Phoenix Paint Facility,US,WEST,America/Phoenix,45,EMP008,PAINT,INACTIVE,2018-01-01,2023-06-30

@@ -1,0 +1,17 @@
+views:
+  - name: dealer_performance
+    description: Dealer warranty performance scorecard view
+    cubes:
+      - join_path: dealer_scorecard
+        includes:
+          - dealer_id
+          - claim_year
+          - total_claims
+          - total_claim_amount
+          - avg_claim_amount
+          - approval_rate_pct
+          - rejection_rate_pct
+          - tier
+          - dealer_risk_tier
+          - pct_over_standard_labor
+          - count

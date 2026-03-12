@@ -1,0 +1,15 @@
+views:
+  - name: compliance_overview
+    description: Executive compliance dashboard view
+
+    cubes:
+      - join_path: product_compliance_status
+        includes:
+          - product_id
+          - product_description
+          - business_unit
+          - product_category
+          - overall_compliance_status
+          - count
+          - violations_found
+          - lists_screened

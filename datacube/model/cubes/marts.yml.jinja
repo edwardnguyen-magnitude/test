@@ -1,0 +1,38 @@
+cubes:
+{% for model in dbt_models() %}
+  - name: {{ cube_name(model.name) }}
+    sql_table: {{ model.sql_table }}
+    description: {{ model.description }}
+
+    dimensions:
+{% for col in model.columns %}
+{% if col.meta.cube_measure is not defined %}
+      - name: {{ col.name }}
+        sql: {{ col.sql }}
+        type: {{ col.type }}
+{% endif %}
+{% endfor %}
+
+    measures:
+      - name: count
+        type: count
+{% for col in model.columns %}
+{% if col.meta.cube_measure is defined %}
+      - name: {{ col.name }}
+        sql: {{ col.sql }}
+        type: {{ col.meta.cube_measure }}
+        title: {{ col.description }}
+{% endif %}
+{% endfor %}
+
+    segments:
+{% for col in model.columns %}
+{% if col.meta.cube_segments is defined %}
+{% for seg in col.meta.cube_segments %}
+      - name: {{ seg.name }}
+        sql: {{ "{CUBE}." ~ col.name ~ " = '" ~ seg.value ~ "'" }}
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+{% endfor %}

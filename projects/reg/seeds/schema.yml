@@ -1,0 +1,208 @@
+version: 2
+
+seeds:
+  - name: customers
+    description: >
+      Raw ESI customer data. Companies that submit regulatory compliance survey requests
+      across EMEA, Americas, and Asia regions.
+    columns:
+      - name: customer_id
+        description: Unique customer identifier (CUST-NNN format)
+        tests: [unique, not_null]
+      - name: customer_name
+        description: Legal or trading name of the customer organization
+        tests: [not_null]
+      - name: region
+        description: Geographic region of the customer (EMEA, Americas, Asia)
+        tests:
+          - accepted_values:
+              values: ['EMEA', 'Americas', 'Asia']
+      - name: industry
+        description: Primary industry classification of the customer
+      - name: contact_email
+        description: Regulatory compliance contact email address
+      - name: active_since
+        description: Date the customer relationship was established
+
+  - name: products
+    description: >
+      Chemical products manufactured by ESI business units including Alpha Assembly Solutions,
+      Enthone, Coventya, Electrolube, Kester, and MacDermid.
+    columns:
+      - name: product_id
+        description: Unique product identifier (PRD-NNN format)
+        tests: [unique, not_null]
+      - name: product_code
+        description: Internal product code used for identification
+        tests: [unique, not_null]
+      - name: product_description
+        description: Human-readable product name and description
+      - name: business_unit
+        description: ESI business unit that manufactures this product
+        tests:
+          - accepted_values:
+              values: ['Alpha', 'Enthone', 'Coventya', 'Electrolube', 'Kester', 'MacDermid']
+      - name: product_category
+        description: Product classification category (e.g., Soldering Materials, Surface Finishing)
+      - name: cas_registry
+        description: CAS registry number or 'mixture' for multi-component products
+
+  - name: regulatory_lists
+    description: >
+      Regulatory substance restriction lists tracked globally, including SVHC, RoHS,
+      TSCA PBT, CA Prop 65, K-REACH, GADSL, and others.
+    columns:
+      - name: list_id
+        description: Unique regulatory list identifier (LIST-NNN format)
+        tests: [unique, not_null]
+      - name: list_code
+        description: Short code for the regulatory list (e.g., SVHC, RoHS, TSCA_PBT)
+        tests: [unique, not_null]
+      - name: list_name
+        description: Full official name of the regulatory list
+      - name: region
+        description: Geographic jurisdiction of the regulation (EU, US, KR, Global, etc.)
+      - name: authority
+        description: Regulatory authority that maintains the list (e.g., ECHA, EPA)
+      - name: last_updated
+        description: Date the regulatory list was last updated
+      - name: substance_count
+        description: Number of substances currently on the regulatory list
+
+  - name: restricted_substances
+    description: >
+      Chemical substances appearing on one or more regulatory lists with restriction thresholds,
+      types, and hazard classifications. Includes real CAS numbers.
+    columns:
+      - name: substance_id
+        description: Unique substance identifier (SUB-NNN format)
+        tests: [unique, not_null]
+      - name: substance_name
+        description: Common chemical name of the substance
+      - name: cas_number
+        description: Chemical Abstracts Service registry number
+      - name: list_id
+        description: Foreign key to the regulatory list this substance appears on
+        tests:
+          - not_null
+          - relationships:
+              to: ref('regulatory_lists')
+              field: list_id
+      - name: threshold_ppm
+        description: Maximum allowed concentration in parts per million
+      - name: restriction_type
+        description: Type of restriction (banned, restricted, declarable, candidate)
+      - name: hazard_class
+        description: Hazard classification (e.g., CMR, PBT, vPvB, ED)
+
+  - name: product_substances
+    description: >
+      Links ESI products to restricted substances with measured concentration levels,
+      verification dates, and data source provenance.
+    columns:
+      - name: product_substance_id
+        description: Unique product-substance link identifier (PS-NNN format)
+        tests: [unique, not_null]
+      - name: product_id
+        description: Foreign key to the product
+        tests:
+          - not_null
+          - relationships:
+              to: ref('products')
+              field: product_id
+      - name: substance_id
+        description: Foreign key to the restricted substance
+        tests:
+          - not_null
+          - relationships:
+              to: ref('restricted_substances')
+              field: substance_id
+      - name: concentration_ppm
+        description: Measured concentration of the substance in the product (parts per million)
+      - name: last_verified_date
+        description: Date the concentration measurement was last verified
+      - name: data_source
+        description: Source of the substance data (e.g., Sphera Cloud, SDS Review, Lab Analysis)
+
+  - name: survey_requests
+    description: >
+      Customer regulatory compliance survey requests. Each survey covers one or more products
+      against a specific regulatory framework.
+    columns:
+      - name: survey_id
+        description: Unique survey request identifier (SRV-NNN format)
+        tests: [unique, not_null]
+      - name: customer_id
+        description: Foreign key to the requesting customer
+        tests:
+          - not_null
+          - relationships:
+              to: ref('customers')
+              field: customer_id
+      - name: region
+        description: Region the survey pertains to
+      - name: survey_type
+        description: Regulatory framework being assessed (e.g., SVHC, RoHS, TSCA_PBT)
+      - name: complexity
+        description: Survey complexity level (easy, mid-complex, complex)
+      - name: product_count
+        description: Number of products included in the survey
+      - name: status
+        description: Current status of the survey (completed, in_progress, pending, cancelled)
+      - name: requested_date
+        description: Date the survey was requested by the customer
+      - name: due_date
+        description: Contractual due date for survey completion
+      - name: completed_date
+        description: Actual date the survey was completed (null if not yet completed)
+      - name: business_unit
+        description: ESI business unit handling the survey
+
+  - name: survey_responses
+    description: >
+      Individual product-substance compliance responses within surveys.
+      Each row represents one product-substance compliance determination.
+    columns:
+      - name: response_id
+        description: Unique response identifier (RSP-NNN format)
+        tests: [unique, not_null]
+      - name: survey_id
+        description: Foreign key to the parent survey request
+        tests:
+          - not_null
+          - relationships:
+              to: ref('survey_requests')
+              field: survey_id
+      - name: product_id
+        description: Product being assessed
+      - name: substance_id
+        description: Substance being checked for compliance
+      - name: compliance_status
+        description: Compliance determination (compliant, non_compliant, flagged, under_review)
+      - name: declared_concentration_ppm
+        description: Declared concentration of substance in the product (parts per million)
+      - name: response_date
+        description: Date the compliance response was submitted
+      - name: analyst
+        description: Name of the analyst who performed the assessment
+
+  - name: regulatory_data_sources
+    description: >
+      External and internal data sources used for regulatory intelligence and substance
+      screening, including government databases, commercial platforms, and internal systems.
+    columns:
+      - name: source_id
+        description: Unique data source identifier (SRC-NNN format)
+        tests: [unique, not_null]
+      - name: source_name
+        description: Name of the regulatory data source
+      - name: source_type
+        description: Category of data source (government, commercial, news, consultant, internal)
+      - name: region
+        description: Geographic region the data source covers
+      - name: url
+        description: URL or access point for the data source
+      - name: update_frequency
+        description: How often the data source is updated (daily, weekly, monthly, quarterly)
+      - name: last_checked
+        description: Date the data source was last checked for updates

@@ -1,0 +1,65 @@
+{% set products = dbt_model('stg_products') %}
+{% set regulatory_lists = dbt_model('stg_regulatory_lists') %}
+{% set restricted_substances = dbt_model('stg_restricted_substances') %}
+{% set product_substances = dbt_model('stg_product_substances') %}
+
+cubes:
+  - name: products
+    sql_table: {{ products.sql_table }}
+    description: {{ products.description }}
+
+    dimensions:
+      {{ products.as_dimensions() }}
+
+    measures:
+      - name: count
+        type: count
+
+  - name: regulatory_lists
+    sql_table: {{ regulatory_lists.sql_table }}
+    description: {{ regulatory_lists.description }}
+
+    dimensions:
+      {{ regulatory_lists.as_dimensions() }}
+
+    measures:
+      - name: count
+        type: count
+
+  - name: restricted_substances
+    sql_table: {{ restricted_substances.sql_table }}
+    description: {{ restricted_substances.description }}
+
+    joins:
+      - name: regulatory_lists
+        sql: "{CUBE.list_id} = {regulatory_lists.list_id}"
+        relationship: many_to_one
+
+    dimensions:
+      {{ restricted_substances.as_dimensions() }}
+
+    measures:
+      - name: count
+        type: count
+
+  - name: product_substances
+    sql_table: {{ product_substances.sql_table }}
+    description: {{ product_substances.description }}
+
+    joins:
+      - name: products
+        sql: "{CUBE.product_id} = {products.product_id}"
+        relationship: many_to_one
+      - name: restricted_substances
+        sql: "{CUBE.substance_id} = {restricted_substances.substance_id}"
+        relationship: many_to_one
+
+    dimensions:
+      {{ product_substances.as_dimensions() }}
+
+    measures:
+      - name: count
+        type: count
+      - name: avg_concentration
+        sql: concentration_ppm
+        type: avg

@@ -1,0 +1,21 @@
+configuration_id,tenant_id,truck_model_id,configuration_code,description,market,has_custom_engineering,requires_special_test,requires_custom_paint,base_price_adjustment,created_at
+CFG001,fab_trucking,TM001,FT-X900-STD,Standard Configuration,US,false,false,false,0.00,2023-01-01
+CFG002,fab_trucking,TM001,FT-X900-FLEET-A,Fleet Package A,US,false,true,false,5000.00,2023-01-01
+CFG003,fab_trucking,TM001,FT-X900-CUST-123,Custom Build for Acme Logistics,US,true,true,true,25000.00,2023-03-15
+CFG004,fab_trucking,TM002,FT-X700-STD,Standard Configuration,US,false,false,false,0.00,2023-01-01
+CFG005,fab_trucking,TM002,FT-X700-SLEEPER,Sleeper Cab Package,US,false,true,false,8000.00,2023-01-01
+CFG006,fab_trucking,TM003,FT-M500-STD,Standard Configuration,US,false,false,false,0.00,2023-01-01
+CFG007,fab_trucking,TM003,FT-M500-REFRIG,Refrigerated Package,US,true,true,false,15000.00,2023-02-01
+CFG008,fab_trucking,TM004,FT-M400-CITY,City Delivery Package,US,false,false,false,2000.00,2023-01-01
+CFG009,fab_trucking,TM005,FT-L300-STD,Standard Configuration,US,false,false,false,0.00,2023-01-01
+CFG010,fab_trucking,TM006,FT-X900E-STD,Standard Electric,US,false,true,false,0.00,2023-06-01
+CFG011,fab_trucking,TM006,FT-X900E-LONG,Extended Range Electric,US,true,true,false,35000.00,2023-06-01
+CFG012,fab_trucking,TM007,FT-X800-STD,Standard Sleeper,US,false,false,false,0.00,2023-01-01
+CFG013,fab_trucking,TM001,FT-X900-GOV,Government Fleet,US,true,true,true,12000.00,2023-04-01
+CFG014,fab_trucking,TM002,FT-X700-EU,European Spec,EU,true,true,false,18000.00,2023-05-01
+CFG015,fab_trucking,TM003,FT-M500-CA,California Emissions,US,true,true,false,8500.00,2023-01-01
+CFG016,fab_trucking,TM008,FT-M550-PHARMA,Pharmaceutical Transport,US,true,true,true,28000.00,2023-03-01
+CFG017,fab_trucking,TM009,FT-X700H-STD,Standard Hybrid,US,false,true,false,0.00,2024-01-01
+CFG018,fab_trucking,TM010,FT-M450-CONSTR,Construction Package,US,false,true,false,6000.00,2023-01-01
+CFG019,fab_trucking,TM001,FT-X900-HAZMAT,Hazmat Transport,US,true,true,true,32000.00,2023-02-15
+CFG020,fab_trucking,TM004,FT-M400-RETAIL,Retail Delivery,US,false,false,true,4500.00,2023-01-01

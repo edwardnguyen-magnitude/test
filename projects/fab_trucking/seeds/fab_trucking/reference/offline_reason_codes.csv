@@ -1,0 +1,8 @@
+reason_code,reason_name,reason_category,responsible_function,typical_resolution_days,sla_days,description
+PART_SHORTAGE,Part Shortage,MATERIALS,MATERIALS,3,5,Parts not available for build completion
+QA_DELAY,QA/Inspection Delay,QUALITY,QUALITY,1,2,Waiting for quality inspection or approval
+SPEC_ISSUE,Specification Issue,ENGINEERING,ENGINEERING,2,3,Customer or engineering specification problem
+ENGINEERING_BOM,Engineering BOM Issue,ENGINEERING,ENGINEERING,5,7,Bill of materials discrepancy or error
+DYNO_TEST,Dynamometer Test Issue,QUALITY,QUALITY,2,3,Failed or incomplete dyno testing
+PAINT,Paint Issue,PLANT,PLANT_MGMT,1,2,Paint defect or custom paint requirement
+OTHER,Other,GENERAL,PLANT_MGMT,2,5,Miscellaneous issues not categorized elsewhere

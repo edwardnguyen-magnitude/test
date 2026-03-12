@@ -1,0 +1,28 @@
+views:
+  - name: product_substance_analysis
+    description: Product-substance compliance analysis with regulatory context
+
+    cubes:
+      - join_path: product_substances
+        includes:
+          - count
+          - avg_concentration
+
+      - join_path: product_substances.products
+        includes:
+          - product_description
+          - business_unit
+          - product_category
+
+      - join_path: product_substances.restricted_substances
+        includes:
+          - substance_name
+          - cas_number
+          - restriction_type
+          - hazard_class
+
+      - join_path: product_substances.restricted_substances.regulatory_lists
+        includes:
+          - list_code
+          - list_name
+          - region

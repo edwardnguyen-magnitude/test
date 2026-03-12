@@ -1,0 +1,112 @@
+# Declarative Airbyte configuration for the reg demo.
+# Used by the medallion pipeline to auto-provision sources, destinations, and connections.
+# Streams are auto-discovered by Airbyte from the source schemas.
+
+pipelines:
+  # Pipeline 1: Source DB → Warehouse (raw schema)
+  - source:
+      name: source-db
+      configuration:
+        sourceType: postgres
+        host: host.docker.internal
+        port: 5432
+        database: source
+        username: postgres
+        password: postgres
+        schemas: ["raw"]
+        ssl_mode:
+          mode: prefer
+
+    destination:
+      name: warehouse
+      configuration:
+        destinationType: postgres
+        host: host.docker.internal
+        port: 5432
+        database: reg
+        schema: raw
+        username: postgres
+        password: postgres
+        ssl_mode:
+          mode: prefer
+
+    connection:
+      name: source-to-warehouse
+      schedule: manual
+      namespace_definition: destination
+      streams:
+        - name: customers
+          sync_mode: incremental_deduped_history
+          primary_key: [["customer_id"]]
+          cursor_field: ["customer_id"]
+        - name: products
+          sync_mode: incremental_deduped_history
+          primary_key: [["product_id"]]
+          cursor_field: ["product_id"]
+        - name: product_substances
+          sync_mode: incremental_deduped_history
+          primary_key: [["product_substance_id"]]
+          cursor_field: ["product_substance_id"]
+        - name: regulatory_lists
+          sync_mode: incremental_deduped_history
+          primary_key: [["list_id"]]
+          cursor_field: ["list_id"]
+        - name: restricted_substances
+          sync_mode: incremental_deduped_history
+          primary_key: [["substance_id"]]
+          cursor_field: ["substance_id"]
+        - name: regulatory_data_sources
+          sync_mode: incremental_deduped_history
+          primary_key: [["source_id"]]
+          cursor_field: ["source_id"]
+        - name: survey_requests
+          sync_mode: incremental_deduped_history
+          primary_key: [["survey_id"]]
+          cursor_field: ["survey_id"]
+        - name: survey_responses
+          sync_mode: incremental_deduped_history
+          primary_key: [["response_id"]]
+          cursor_field: ["response_id"]
+
+  # Pipeline 2: Warehouse marts → Gold schema (post-Cube/dbt)
+  - source:
+      name: warehouse-marts
+      configuration:
+        sourceType: postgres
+        host: host.docker.internal
+        port: 5432
+        database: reg
+        username: postgres
+        password: postgres
+        schemas: ["marts"]
+        ssl_mode:
+          mode: prefer
+
+    destination:
+      name: gold
+      configuration:
+        destinationType: postgres
+        host: host.docker.internal
+        port: 5432
+        database: reg
+        schema: gold
+        username: postgres
+        password: postgres
+        ssl_mode:
+          mode: prefer
+
+    connection:
+      name: marts-to-gold
+      schedule: manual
+      namespace_definition: destination
+      streams:
+        - name: mart_customer_compliance_dashboard
+          sync_mode: full_refresh_overwrite
+        - name: mart_product_compliance_status
+          sync_mode: full_refresh_overwrite
+        - name: mart_regional_survey_summary
+          sync_mode: full_refresh_overwrite
+        - name: mart_regulatory_list_coverage
+          sync_mode: full_refresh_overwrite
+        - name: mart_substance_risk_assessment
+          sync_mode: full_refresh_overwrite

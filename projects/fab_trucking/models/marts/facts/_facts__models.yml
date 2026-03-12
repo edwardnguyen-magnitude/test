@@ -1,0 +1,314 @@
+version: 2
+
+models:
+  - name: fct_fab_trucking__truck_builds
+    description: Truck build fact table with build timing and status
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier1
+    columns:
+      - name: truck_build_key
+        description: Surrogate key for truck build
+        data_tests:
+          - unique
+          - not_null
+      - name: truck_build_id
+        description: Natural key for truck build
+        data_tests:
+          - unique
+          - not_null
+      - name: vin
+        description: Vehicle Identification Number
+        data_tests:
+          - unique
+          - not_null
+      - name: plant_id
+        description: Foreign key to plant dimension
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_fab_trucking__plants')
+                field: plant_id
+      - name: configuration_id
+        description: Foreign key to configuration dimension
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_fab_trucking__configurations')
+                field: configuration_id
+      - name: customer_id
+        description: Foreign key to customer dimension
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_fab_trucking__customers')
+                field: customer_id
+
+  - name: fct_fab_trucking__offline_cases
+    description: Main fact table for offline truck cases with full context
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier1
+    columns:
+      - name: offline_case_key
+        description: Surrogate key for offline case
+        data_tests:
+          - unique
+          - not_null
+      - name: offline_case_id
+        description: Natural key for offline case
+        data_tests:
+          - unique
+          - not_null
+      - name: vin
+        description: Vehicle Identification Number
+        data_tests:
+          - not_null
+      - name: plant_id
+        description: Foreign key to plant dimension
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_fab_trucking__plants')
+                field: plant_id
+      - name: configuration_id
+        description: Foreign key to configuration dimension
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_fab_trucking__configurations')
+                field: configuration_id
+      - name: customer_id
+        description: Foreign key to customer dimension
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_fab_trucking__customers')
+                field: customer_id
+
+  - name: fct_fab_trucking__material_shortages
+    description: Material shortage fact table with impact analysis
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier1
+    columns:
+      - name: shortage_key
+        description: Surrogate key for shortage
+        data_tests:
+          - unique
+          - not_null
+      - name: shortage_id
+        description: Natural key for shortage
+        data_tests:
+          - unique
+          - not_null
+
+  - name: fct_fab_trucking__inspections
+    description: Inspection event fact table
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier1
+    columns:
+      - name: inspection_key
+        description: Surrogate key for inspection
+        data_tests:
+          - unique
+          - not_null
+      - name: inspection_event_id
+        description: Natural key for inspection (canonical)
+        data_tests:
+          - unique
+          - not_null
+      - name: plant_id
+        description: Foreign key to plant dimension
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_fab_trucking__plants')
+                field: plant_id
+      - name: workcenter_id
+        description: Foreign key to workcenter dimension
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_fab_trucking__workcenters')
+                field: workcenter_id
+
+  - name: fct_fab_trucking__test_results
+    description: Test result fact table (dyno, road tests)
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier1
+    columns:
+      - name: test_result_key
+        description: Surrogate key for test result
+        data_tests:
+          - unique
+          - not_null
+      - name: test_result_id
+        description: Natural key for test result
+        data_tests:
+          - unique
+          - not_null
+      - name: plant_id
+        description: Foreign key to plant dimension
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_fab_trucking__plants')
+                field: plant_id
+      - name: workcenter_id
+        description: Foreign key to workcenter dimension
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_fab_trucking__workcenters')
+                field: workcenter_id
+
+  - name: fct_fab_trucking__approvals
+    description: Approval event fact table with wait time analysis
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier1
+    columns:
+      - name: approval_key
+        description: Surrogate key for approval
+        data_tests:
+          - unique
+          - not_null
+      - name: approval_event_id
+        description: Natural key for approval (canonical)
+        data_tests:
+          - unique
+          - not_null
+      - name: plant_id
+        description: Foreign key to plant dimension
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_fab_trucking__plants')
+                field: plant_id
+
+  - name: fct_fab_trucking__defects
+    description: Defect fact table with severity and repair tracking
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier1
+    columns:
+      - name: defect_key
+        description: Surrogate key for defect
+        data_tests:
+          - unique
+          - not_null
+      - name: defect_id
+        description: Natural key for defect
+        data_tests:
+          - unique
+          - not_null
+      - name: plant_id
+        description: Foreign key to plant dimension
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_fab_trucking__plants')
+                field: plant_id
+
+  - name: fct_fab_trucking__paint_operations
+    description: Paint operation fact table with duration and rework tracking
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier1
+    columns:
+      - name: paint_operation_key
+        description: Surrogate key for paint operation
+        data_tests:
+          - unique
+          - not_null
+      - name: paint_operation_id
+        description: Natural key for paint operation
+        data_tests:
+          - unique
+          - not_null
+      - name: vin
+        description: Vehicle Identification Number
+        data_tests:
+          - not_null
+      - name: plant_id
+        description: Foreign key to plant dimension
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_fab_trucking__plants')
+                field: plant_id
+      - name: workcenter_id
+        description: Foreign key to workcenter dimension
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_fab_trucking__workcenters')
+                field: workcenter_id
+      - name: paint_code
+        description: Paint color/type code
+        data_tests:
+          - not_null
+      - name: paint_result
+        description: Result of paint operation (OK, REWORK_REQUIRED)
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['OK', 'REWORK_REQUIRED']
+
+  - name: fct_fab_trucking__warranty_claims
+    description: Warranty claim fact table with cost and duration tracking
+    config:
+      meta:
+        openmetadata:
+          owner: [fab_trucking_ops, data-engineering]
+          tier: Tier.Tier1
+    columns:
+      - name: warranty_claim_key
+        description: Surrogate key for warranty claim
+        data_tests:
+          - unique
+          - not_null
+      - name: warranty_claim_id
+        description: Natural key for warranty claim
+        data_tests:
+          - unique
+          - not_null
+      - name: vin
+        description: Vehicle Identification Number
+        data_tests:
+          - not_null
+      - name: customer_id
+        description: Foreign key to customer
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_fab_trucking__customers')
+                field: customer_id
+      - name: claim_status
+        description: Current status of the warranty claim
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['OPEN', 'IN_REVIEW', 'CLOSED', 'DENIED']
+      - name: cost_amount
+        description: Cost amount of the warranty claim
