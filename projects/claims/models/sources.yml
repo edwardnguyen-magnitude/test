@@ -1,0 +1,32 @@
+version: 2
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: fact_claim_attachments
+        identifier: fact_claim_attachments
+        description: "Postgres table for claim attachments."
+      - name: fact_claim_audit_log
+        identifier: fact_claim_audit_log
+        description: "Postgres table for claim audit log."
+      - name: fact_claim_lines
+        identifier: fact_claim_lines
+        description: "Postgres table for claim lines."
+      - name: fact_claims
+        identifier: fact_claims
+        description: "Postgres table for claims."
+      - name: fact_cluster_assignments
+        identifier: fact_cluster_assignments
+        description: "Postgres table for cluster assignments."
+      - name: dim_vehicles
+        identifier: dim_vehicles
+        description: "Dimension table for vehicles."
+      - name: ref_dealer_baselines
+        identifier: ref_dealer_baselines
+        description: "Reference table for dealer baselines."
+      - name: ref_pfp
+        identifier: ref_pfp
+        description: "Reference PFP table."
+      - name: ref_srt
+        identifier: ref_srt
+        description: "Reference SRT table."

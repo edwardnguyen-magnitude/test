@@ -16,4 +16,4 @@ select
     cast(build_date as date) as build_date,
     trim(production_batch) as production_batch
 
-from {{ ref('dim_vehicles') }}
+from {{ source('raw', 'dim_vehicles') }}

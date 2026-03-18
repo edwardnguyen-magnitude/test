@@ -12,4 +12,4 @@ select
     cast(rejection_rate_pct as numeric) as rejection_rate_pct,
     trim(tier) as tier
 
-from {{ ref('ref_dealer_baselines') }}
+from {{ source('raw', 'ref_dealer_baselines') }}

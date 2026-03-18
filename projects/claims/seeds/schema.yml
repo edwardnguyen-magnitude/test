@@ -122,7 +122,7 @@ seeds:
           - not_null
           - relationships:
               arguments:
-                to: ref('fact_claims')
+                to: source('raw', 'fact_claims')
                 field: claim_id
       - name: line_number
         description: Sequential line number within the claim
@@ -175,7 +175,7 @@ seeds:
           - not_null
           - relationships:
               arguments:
-                to: ref('fact_claims')
+                to: source('raw', 'fact_claims')
                 field: claim_id
       - name: file_name
         description: Original uploaded file name
@@ -216,7 +216,7 @@ seeds:
           - not_null
           - relationships:
               arguments:
-                to: ref('fact_claims')
+                to: source('raw', 'fact_claims')
                 field: claim_id
       - name: action
         description: Workflow action performed
@@ -257,7 +257,7 @@ seeds:
           - not_null
           - relationships:
               arguments:
-                to: ref('fact_claims')
+                to: source('raw', 'fact_claims')
                 field: claim_id
       - name: cluster_id
         description: Descriptive cluster name (e.g., Electrical-Intermittent-Faults)

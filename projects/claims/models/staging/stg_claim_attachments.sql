@@ -9,4 +9,4 @@ select
     cast(ssim_match_score as numeric) as ssim_match_score,
     case when is_duplicate_flag = 'Y' then true else false end as is_duplicate_flag
 
-from {{ ref('fact_claim_attachments') }}
+from {{ source('raw', 'fact_claim_attachments') }}

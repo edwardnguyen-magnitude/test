@@ -8,4 +8,4 @@ select
     cast(cluster_std_claim_amount as numeric) as cluster_std_claim_amount,
     cast(claim_amount_z_score as numeric) as claim_amount_z_score
 
-from {{ ref('fact_cluster_assignments') }}
+from {{ source('raw', 'fact_cluster_assignments') }}

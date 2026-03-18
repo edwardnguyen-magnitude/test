@@ -13,4 +13,4 @@ select
     trim(period) as period,
     cast(last_updated as date) as last_updated
 
-from {{ ref('ref_pfp') }}
+from {{ source('raw', 'ref_pfp') }}

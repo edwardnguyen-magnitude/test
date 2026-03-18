@@ -10,4 +10,4 @@ select
     trim(notes) as notes,
     nullif(trim(routing_rule), '') as routing_rule
 
-from {{ ref('fact_claim_audit_log') }}
+from {{ source('raw', 'fact_claim_audit_log') }}

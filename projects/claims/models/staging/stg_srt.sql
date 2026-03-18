@@ -9,4 +9,4 @@ select
     cast(effective_date as date) as effective_date,
     cast(last_updated as date) as last_updated
 
-from {{ ref('ref_srt') }}
+from {{ source('raw', 'ref_srt') }}

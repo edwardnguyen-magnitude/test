@@ -31,4 +31,4 @@ select
     case when pre_authorized = 'Y' then true else false end as pre_authorized,
     trim(submission_channel) as submission_channel
 
-from {{ ref('fact_claims') }}
+from {{ source('raw', 'fact_claims') }}

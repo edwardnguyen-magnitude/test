@@ -15,4 +15,4 @@ select
     cast(cost_variance_pct as numeric) as cost_variance_pct,
     trim(repair_type) as repair_type
 
-from {{ ref('fact_claim_lines') }}
+from {{ source('raw', 'fact_claim_lines') }}
