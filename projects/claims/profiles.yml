@@ -28,6 +28,6 @@ default:
       user: "{{ env_var('DBT_USER', 'postgres') }}"
       pass: "{{ env_var('DBT_PASSWORD', 'postgres') }}"
       dbname: "{{ env_var('DBT_SOURCE_DATABASE', 'source') }}"
-      schema: public
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA', 'synthetic_data') }}"
       threads: 4
       sslmode: "{{ env_var('DBT_SSLMODE', 'prefer') }}"
