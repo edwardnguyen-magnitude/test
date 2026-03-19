@@ -1,6 +1,16 @@
 default:
-  target: postgres
+  # Switch to ClickHouse for compile/testing via environment variables.
+  target: clickhouse
   outputs:
+    clickhouse:
+      type: clickhouse
+      host: "{{ env_var('DBT_HOST', 'localhost') }}"
+      port: "{{ env_var('DBT_PORT', '8123') | int }}"
+      user: "{{ env_var('DBT_USER', 'default') }}"
+      password: "{{ env_var('DBT_PASSWORD', '') }}"
+      database: "{{ env_var('DBT_DATABASE', 'raw') }}"
+      schema: raw
+      threads: 4
     postgres:
       type: postgres
       host: "{{ env_var('DBT_HOST', 'localhost') }}"

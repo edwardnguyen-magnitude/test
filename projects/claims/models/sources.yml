@@ -6,27 +6,36 @@ sources:
       - name: fact_claim_attachments
         identifier: fact_claim_attachments
         description: "Postgres table for claim attachments."
+        tags: ["Bronze"]
       - name: fact_claim_audit_log
         identifier: fact_claim_audit_log
         description: "Postgres table for claim audit log."
+        tags: ["Bronze"]
       - name: fact_claim_lines
         identifier: fact_claim_lines
         description: "Postgres table for claim lines."
+        tags: ["Bronze"]
       - name: fact_claims
         identifier: fact_claims
         description: "Postgres table for claims."
+        tags: ["Bronze"]
       - name: fact_cluster_assignments
         identifier: fact_cluster_assignments
         description: "Postgres table for cluster assignments."
+        tags: ["Bronze"]
       - name: dim_vehicles
         identifier: dim_vehicles
         description: "Dimension table for vehicles."
+        tags: ["Bronze"]
       - name: ref_dealer_baselines
         identifier: ref_dealer_baselines
         description: "Reference table for dealer baselines."
+        tags: ["Bronze"]
       - name: ref_pfp
         identifier: ref_pfp
         description: "Reference PFP table."
+        tags: ["Bronze"]
       - name: ref_srt
         identifier: ref_srt
         description: "Reference SRT table."
+        tags: ["Bronze"]
